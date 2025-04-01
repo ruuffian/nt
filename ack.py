@@ -15,6 +15,8 @@ M = 0
 N = 0
 ITERATIONS = 100
 
+# ----- ALGORITHMS ----
+
 
 def a(m, n):
     """Naive Ackermann function implementation."""
@@ -49,6 +51,8 @@ def memoized_a(m, n):
             return val
     return _memoized_a(m, n)
 
+# ----- BENCHMARKING ------
+
 
 def track_recursive_calls(fn, *args):
     """Wrap a recursive function to track total recursive calls.
@@ -62,26 +66,8 @@ def track_recursive_calls(fn, *args):
     return val, fn.count
 
 
-def avg(vals):
-    return sum(vals) / len(vals)
-
-
-def variance(vals):
-    average = avg(vals)
-    return sum([(x - average)**2 for x in vals]) / len(vals)
-
-
-def std_dev(vals):
-    return variance(vals)**0.5
-
-
-def analyze_marks(raw_marks):
-    marks = [x * 1000 for x in raw_marks]
-    return marks, avg(marks), min(marks), max(marks), variance(marks), std_dev(marks)
-
-
 def benchmark(fn_str, enable_gc=False):
-    """Coordinate benchmark() calls on a function."""
+    """Coordinate calls on a function."""
     marks = timeit.repeat(stmt=f'{fn_str}(M, N)',
                           globals=globals(),
                           repeat=ITERATIONS,
@@ -103,7 +89,7 @@ def report_marks(fn_str, marks):
 
 
 def run_benchmark(fn, fn_str, descriptor, enable_gc=False):
-    """Run and print a benchmark for a fn."""
+    """Run a function with recursive tracking, then benchmark it."""
     print(f'{fn_str}({M},{N}) => {{')
     ackermann, calls = track_recursive_calls(fn, M, N)
     print(f'\tAckermann Number: {ackermann}')
@@ -112,6 +98,28 @@ def run_benchmark(fn, fn_str, descriptor, enable_gc=False):
     marks = benchmark(fn_str, enable_gc)
     report_marks(fn_str, marks)
 
+# ----- DATA ANALYSIS ------
+
+
+def avg(vals):
+    return sum(vals) / len(vals)
+
+
+def variance(vals):
+    average = avg(vals)
+    return sum([(x - average)**2 for x in vals]) / len(vals)
+
+
+def std_dev(vals):
+    return variance(vals)**0.5
+
+
+def analyze_marks(raw_marks):
+    marks = [x * 1000 for x in raw_marks]
+    return marks, avg(marks), min(marks), max(marks), variance(marks), std_dev(marks)
+
+
+# ----- SCRIPT -----
 
 def main():
     sys.setrecursionlimit(10**6)
@@ -120,6 +128,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # Can't access M, N, or ITERATIONS from main() function
     parser = argparse.ArgumentParser(
         description='Benchmarks varius Ackermann\'s function implementations against each other.'
     )
