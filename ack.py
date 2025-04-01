@@ -7,12 +7,12 @@
 #            }
 
 import sys
-import gc
 import timeit
+import argparse
 
 # Bounds on Ackermann inputs
-M = 3
-N = 7
+M = 0
+N = 0
 ITERATIONS = 100
 
 
@@ -27,7 +27,7 @@ def a(m, n):
 
 
 def memoized_a(m, n):
-    """Utilizes an internal cache to skip branches after computing them once."""
+    """Utilizes a cache to skip branches after computing them once."""
 
     cache = {}
 
@@ -81,12 +81,7 @@ def analyze_marks(raw_marks):
 
 def benchmark(fn_str, enable_gc=False):
     """Coordinate benchmark() calls on a function."""
-    setup = ''
-    if enable_gc:
-        setup = 'gc.enable()'
-# Monkeypatch timeit template to access the timed function's return value.
     marks = timeit.repeat(stmt=f'{fn_str}(M, N)',
-                          setup=setup,
                           globals=globals(),
                           repeat=ITERATIONS,
                           number=1)
@@ -110,7 +105,7 @@ def run_benchmark(fn, fn_str, descriptor, enable_gc=False):
     """Run and print a benchmark for a fn."""
     print(f'{fn_str}({M},{N}) => {{')
     ackermann, calls = track_recursive_calls(fn, M, N)
-    print(f'\tAckerman Number: {ackermann}')
+    print(f'\tAckermann Number: {ackermann}')
     print(f'\tTotal Recursive Calls: {calls}')
     print(f'\tBenchmarking {descriptor} Ackermann function...')
     marks = benchmark(fn_str, enable_gc)
@@ -124,4 +119,20 @@ def main():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='Benchmarks varius Ackermann\'s function implementations against each other.'
+    )
+    parser.add_argument(
+        'm',
+        type=int,
+        help='First argument to Ackermann\'s function.'
+    )
+    parser.add_argument(
+        'n',
+        type=int,
+        help='Second argument to Ackermann\'s function.'
+    )
+    args = vars(parser.parse_args())
+    M = args['m']
+    N = args['n']
     main()
