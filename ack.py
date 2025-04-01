@@ -9,64 +9,41 @@
 import sys
 import timeit
 import argparse
+import functools
 
-# Bounds on Ackermann inputs
+# ----- GLOBALS -----
 M = 0
 N = 0
 ITERATIONS = 100
 
-# ----- ALGORITHMS ----
-
-
-def a(m, n):
-    """Naive Ackermann function implementation."""
-    a.count += 1
-    if m == 0:
-        return n + 1
-    if n == 0:
-        return a(m-1, 1)
-    return a(m-1, a(m, n-1))
-
-
-def memoized_a(m, n):
-    """Utilizes a cache to skip branches after computing them once."""
-
-    cache = {}
-
-    def _memoized_a(m, n):
-        memoized_a.count += 1
-        try:
-            return cache[(m, n)]
-        except KeyError:
-            if m == 0:
-                val = n + 1
-                cache[(m, n)] = val
-                return val
-            if n == 0:
-                val = _memoized_a(m-1, 1)
-                cache[(m, n)] = val
-                return val
-            val = _memoized_a(m-1, _memoized_a(m, n-1))
-            cache[(m, n)] = val
-            return val
-    return _memoized_a(m, n)
 
 # ----- BENCHMARKING ------
+def count_calls(fn):
+    """Decorates a recursive function and counts each recursive call."""
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        wrapper.calls += 1
+        return fn(*args, **kwargs)
+    wrapper.calls = 0
+    return wrapper
 
 
-def track_recursive_calls(fn, *args):
-    """Wrap a recursive function to track total recursive calls.
-       Requires the recursive function to increment 'fn.count' at each call.
-        Returns:
-            val - fn() return value
-            count - Total recursive calls
+def run_benchmark(fn, fn_str, descriptor, *args):
+    """Run a function with recursive tracking, then benchmark it.
+    Requres fn to be decorated with '@count_calls'
     """
-    fn.count = 0
+    print(*args)
+    print(f'{fn_str}({M},{N}) => {{')
     val = fn(*args)
-    return val, fn.count
+    calls = fn.calls
+    print(f'\tFunction Return: {val}')
+    print(f'\tTotal Recursive Calls: {calls}')
+    print(f'\tBenchmarking {descriptor} alg...')
+    marks = benchmark(fn_str)
+    report_marks(fn_str, marks)
 
 
-def benchmark(fn_str, enable_gc=False):
+def benchmark(fn_str):
     """Coordinate calls on a function."""
     marks = timeit.repeat(stmt=f'{fn_str}(M, N)',
                           globals=globals(),
@@ -87,20 +64,45 @@ def report_marks(fn_str, marks):
     print('\t}')
     print('}')
 
+# ----- ALGORITHMS ----
 
-def run_benchmark(fn, fn_str, descriptor, enable_gc=False):
-    """Run a function with recursive tracking, then benchmark it."""
-    print(f'{fn_str}({M},{N}) => {{')
-    ackermann, calls = track_recursive_calls(fn, M, N)
-    print(f'\tAckermann Number: {ackermann}')
-    print(f'\tTotal Recursive Calls: {calls}')
-    print(f'\tBenchmarking {descriptor} Ackermann function...')
-    marks = benchmark(fn_str, enable_gc)
-    report_marks(fn_str, marks)
+
+@count_calls
+def a(m, n):
+    """Naive Ackermann function implementation."""
+    if m == 0:
+        return n + 1
+    if n == 0:
+        return a(m-1, 1)
+    return a(m-1, a(m, n-1))
+
+
+def memoized_a(m, n):
+    """Utilizes a cache to skip branches after computing them once."""
+    cache = {}
+
+    @count_calls
+    def _memoized_a(m, n):
+        try:
+            return cache[(m, n)]
+        except KeyError:
+            if m == 0:
+                val = n + 1
+                cache[(m, n)] = val
+                return val
+            if n == 0:
+                val = _memoized_a(m-1, 1)
+                cache[(m, n)] = val
+                return val
+            val = _memoized_a(m-1, _memoized_a(m, n-1))
+            cache[(m, n)] = val
+            return val
+    val = _memoized_a(m, n)
+    memoized_a.calls = _memoized_a.calls
+    return val
+
 
 # ----- DATA ANALYSIS ------
-
-
 def avg(vals):
     return sum(vals) / len(vals)
 
@@ -115,16 +117,18 @@ def std_dev(vals):
 
 
 def analyze_marks(raw_marks):
+    """Recieves a list of marks and calculates basic summary statistics."""
+    # Seconds -> Milliseconds
     marks = [x * 1000 for x in raw_marks]
     return marks, avg(marks), min(marks), max(marks), variance(marks), std_dev(marks)
 
 
 # ----- SCRIPT -----
-
 def main():
+    # Default recursion limit too low for the Ackermann function
     sys.setrecursionlimit(10**6)
-    run_benchmark(memoized_a, 'memoized_a', 'cache-optimized', True)
-    run_benchmark(a, 'a', 'naive')
+    run_benchmark(memoized_a, 'memoized_a', 'cache-optimized', M, N)
+    run_benchmark(a, 'a', 'naive', M, N)
 
 
 if __name__ == "__main__":
