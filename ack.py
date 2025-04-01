@@ -132,7 +132,16 @@ if __name__ == "__main__":
         type=int,
         help='Second argument to Ackermann\'s function.'
     )
+    parser.add_argument(
+        '--loops',
+        '-l',
+        type=int,
+        help='The number of iterations to use for benchmarking.',
+        default=100
+
+    )
     args = vars(parser.parse_args())
     M = args['m']
     N = args['n']
+    ITERATIONS = args['loops']
     main()
