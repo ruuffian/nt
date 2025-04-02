@@ -13,21 +13,22 @@ struct mark {
 void usage(char*);
 double get_time();
 void run_mark(struct mark *, a_t, int, int);
-void benchmark(a_t, char*, int, int);
 
 int main(int argc, char *argv[]) {
+  // cmdlin parsing
   if (argc != 3) {
     usage(argv[0]);
   }
   int m = atoi(argv[1]);
   int n = atoi(argv[2]);
-  a_t iterative;
-  iterative = &iterative_a;
-  benchmark(iterative, "Iterative", m, n);
-  a_t naive;
-  naive = &a;
-  benchmark(naive, "Naive", m, n);
+  struct mark mark;
+  run_mark(&mark, &iterative_a, m, n);
+  printf("Iterative: (%d, %d) = %ld\n", m, n, mark.val);
+  printf("%g (ms)\n", mark.delta);
   struct mark mark2;
+  run_mark(&mark2, &a, m, n);
+  printf("Naive: (%d, %d) = %ld\n", m, n, mark2.val);
+  printf("%g (ms)\n", mark2.delta);
   return 0;
 }
 
@@ -36,13 +37,6 @@ void usage(char *name) {
   printf("\tm and n are arguments to various implementations of the Ackermann function.\n");
   printf("\tNote that M values greater than 4 are ill-advised- ack(4,2) will likely never compute.\n");
   exit(1);
-}
-
-void benchmark(a_t fn, char* descriptor, int m, int n) {
-  struct mark mark;
-  run_mark(&mark, fn, m, n);
-  printf("%s: (%d, %d) = %ld\n", descriptor, m, n, mark.val);
-  printf("%g (ms)\n", mark.delta);
 }
 
 void run_mark(struct mark *mark, a_t fn, int m, int n) {
