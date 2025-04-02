@@ -10,6 +10,7 @@ import sys
 import timeit
 import argparse
 import functools
+import numpy as np
 
 # ----- GLOBALS -----
 M = 0
@@ -32,7 +33,6 @@ def run_benchmark(fn, fn_str, descriptor, *args):
     """Run a function with recursive tracking, then benchmark it.
     Requres fn to be decorated with '@count_calls'
     """
-    print(*args)
     print(f'{fn_str}({M},{N}) => {{')
     val = fn(*args)
     calls = fn.calls
@@ -53,10 +53,11 @@ def benchmark(fn_str):
 
 
 def report_marks(fn_str, marks):
-    times, avg, min, max, variance, std_dev = analyze_marks(marks)
+    times, avg, min, max, median, variance, std_dev = analyze_marks(marks)
     print(f'\tRuntime Metrics [{len(times)} loops] => {{')
-    print(f'\t\tPeek (top 3): {sorted(times, reverse=True)[0:5]}')
+    print(f'\t\tPeek (top 5): {sorted(times, reverse=True)[0:5]}')
     print(f'\t\tAverage: {avg} ms')
+    print(f'\t\tMedian: {median} ms')
     print(f'\t\tMin time:  {min} ms')
     print(f'\t\tMax time:  {max} ms')
     print(f'\t\tVariance:  {variance}')
@@ -64,9 +65,8 @@ def report_marks(fn_str, marks):
     print('\t}')
     print('}')
 
+
 # ----- ALGORITHMS ----
-
-
 @count_calls
 def a(m, n):
     """Naive Ackermann function implementation."""
@@ -102,31 +102,45 @@ def memoized_a(m, n):
     return val
 
 
+@count_calls
+def ackermann(i, n):
+    """I read this in a paper and wanted to try implementing it with numpy"""
+    next = np.arange(i+1) * 0
+    goal = np.arange(i+1) * 0 + 1
+    goal[i] = -1
+    current = i
+    while next[i] != n + 1:
+        value = next[0] + 1
+        transferring = True
+        current = i
+        while transferring:
+            if next[i-current] == goal[i-current]:
+                goal[i-current] = value
+            else:
+                transferring = False
+            next[i-current] = next[i-current]+1
+            current -= 1
+    return value
+
+
 # ----- DATA ANALYSIS ------
-def avg(vals):
-    return sum(vals) / len(vals)
-
-
-def variance(vals):
-    average = avg(vals)
-    return sum([(x - average)**2 for x in vals]) / len(vals)
-
-
-def std_dev(vals):
-    return variance(vals)**0.5
 
 
 def analyze_marks(raw_marks):
-    """Recieves a list of marks and calculates basic summary statistics."""
+    """Recieves a list of marks and calculates basic summary statistics.
+    This area had a bit more before adding NumPy.
+    """
     # Seconds -> Milliseconds
-    marks = [x * 1000 for x in raw_marks]
-    return marks, avg(marks), min(marks), max(marks), variance(marks), std_dev(marks)
+    marks = np.array(raw_marks, dtype=float)
+    marks = marks * 1000
+    return marks, np.mean(marks), np.min(marks), np.max(marks), np.median(marks), np.var(marks), np.std(marks)
 
 
 # ----- SCRIPT -----
 def main():
     # Default recursion limit too low for the Ackermann function
     sys.setrecursionlimit(10**6)
+    run_benchmark(ackermann, 'ackermann', 'Grossman-Zeitman', M, N)
     run_benchmark(memoized_a, 'memoized_a', 'cache-optimized', M, N)
     run_benchmark(a, 'a', 'naive', M, N)
 
