@@ -10,22 +10,17 @@ struct mark {
   long val;
 };
 
+void usage(char*);
 double get_time();
 void run_mark(struct mark *, a_t, int, int);
 void benchmark(a_t, char*, int, int);
-void usage();
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
-    usage();
-    return 1;
+    usage(argv[0]);
   }
   int m = atoi(argv[1]);
   int n = atoi(argv[2]);
-  if (m == 0 || n == 0) {
-    usage();
-    return 1;
-  }
   a_t iterative;
   iterative = &iterative_a;
   benchmark(iterative, "Iterative", m, n);
@@ -36,8 +31,11 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void usage() {
-  printf("Usage: main <m> <n>");
+void usage(char *name) {
+  printf("Usage: %s m n\n", name);
+  printf("\tm and n are arguments to various implementations of the Ackermann function.\n");
+  printf("\tNote that M values greater than 4 are ill-advised- ack(4,2) will likely never compute.\n");
+  exit(1);
 }
 
 void benchmark(a_t fn, char* descriptor, int m, int n) {
