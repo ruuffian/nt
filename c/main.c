@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
       case 'l':
         iterations = atoi(optarg);
         if (iterations == 0) {
-          fprintf(stderr, "'-l' must be followed by a non-zero number.");
+          fprintf(stderr, "'-l' must be followed by a non-zero number.\n");
           return 1;
         }
         break;
@@ -43,12 +43,12 @@ int main(int argc, char *argv[]) {
         abort();
     }
   }
-  if (argc != 3) {
+  if (argc - optind + 1 != 3) {
     usage(argv[0]);
     return 1;
   }
-  int m = atoi(argv[1]);
-  int n = atoi(argv[2]);
+  int m = atoi(argv[optind]);
+  int n = atoi(argv[optind+1]);
   struct mark mark;
   run_mark(&mark, &iterative_a, m, n);
   printf("Iterative: (%d, %d) = %ld\n", m, n, mark.val);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 }
 
 void usage(char *name) {
-  printf("Usage: %s m n\n", name);
+  printf("Usage: %s m n -l [loops]\n", name);
   printf("\tm and n are arguments to various implementations of the Ackermann function.\n");
   printf("\tNote that M values greater than 4 are ill-advised- ack(4,2) will likely never compute.\n");
 }
