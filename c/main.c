@@ -3,20 +3,35 @@
 #include <sys/resource.h>
 #include "ackermann.h"
 
-#define M 4
-#define N 2
+#define M 3
+#define N 10
+
+struct mark {
+  double delta;
+  int val;
+};
 
 double get_time();
+void benchmark(struct mark *mark, a_t fn);
 
 int main(int argc, char *argv[]) {
+  struct mark mark;
+  a_t naive;
+  naive = &a;
+  benchmark(&mark, naive);
+  printf("A(%d, %d) = %d\n", M, N, mark.val);
+  printf("%g (ms)\n", mark.delta);
+  return 0;
+}
+
+void benchmark(struct mark *mark, a_t fn) {
   double start, end;
   start = get_time();
-  const int ackermann = A(M, N);
+  int val = (*fn)(M, N);
   end = get_time();
-
-  printf("A(%d, %d) = %d\n", M, N, ackermann);
-  printf("%g (ms)\n", (end - start) / (double) 1000);
-  return 0;
+  double delta = (end - start) / (double) 1000;
+  mark->delta = delta;
+  mark->val = val;
 }
 
 double get_time() {

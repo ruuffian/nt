@@ -1,6 +1,6 @@
 all : main
 
-build/ackermann.o: ackermann.c
+build/ackermann.o: ackermann.c ackermann.h
 	gcc -c ackermann.c -o build/ackermann.o
 
 build/main.o: main.c
