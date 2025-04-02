@@ -1,4 +1,4 @@
-typedef int (*a_t)(int, int);
-int a(int, int);
-int memoized_a(int, int);
-int iterative_a(int, int);
+typedef long (*a_t)(int, int);
+long a(int, int);
+long memoized_a(int, int);
+long iterative_a(int, int);
