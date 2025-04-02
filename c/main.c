@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <ctype.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <stdarg.h>
 #include "ackermann.h"
 
 struct mark {
@@ -15,9 +16,36 @@ double get_time();
 void run_mark(struct mark *, a_t, int, int);
 
 int main(int argc, char *argv[]) {
-  // cmdlin parsing
+  // cmdline parsing
+  int iterations =  100;
+  int c;
+  while ((c = getopt (argc, argv, "hl:")) != -1) {
+    switch(c) {
+      case 'h':
+        usage(argv[0]);
+        return 0;
+      case 'l':
+        iterations = atoi(optarg);
+        if (iterations == 0) {
+          fprintf(stderr, "'-l' must be followed by a non-zero number.");
+          return 1;
+        }
+        break;
+      case '?':
+        if (optopt == 'l') 
+          fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+        else if (isprint(optopt)) 
+          fprintf(stderr, "Unknown option character '-%c'.\n", optopt);
+        else 
+          fprintf(stderr, "Unknown option character '\\x%x'.\n", optopt);
+        return 1;
+      default:
+        abort();
+    }
+  }
   if (argc != 3) {
     usage(argv[0]);
+    return 1;
   }
   int m = atoi(argv[1]);
   int n = atoi(argv[2]);
@@ -36,7 +64,6 @@ void usage(char *name) {
   printf("Usage: %s m n\n", name);
   printf("\tm and n are arguments to various implementations of the Ackermann function.\n");
   printf("\tNote that M values greater than 4 are ill-advised- ack(4,2) will likely never compute.\n");
-  exit(1);
 }
 
 void run_mark(struct mark *mark, a_t fn, int m, int n) {
