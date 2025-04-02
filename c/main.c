@@ -4,7 +4,7 @@
 #include "ackermann.h"
 
 #define M 4
-#define N 1
+#define N 2
 
 double get_time();
 
