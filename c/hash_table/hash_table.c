@@ -98,7 +98,7 @@ void print_hash_table() {
       printf("\t%i\t---\n", i);
     } else {
       pair p = hash_table[i]->pair;
-      printf("\t%i\t---\t(%d, %d)\t\n", i, p.m, p.n);
+      printf("\t%i\t---\t(%d, %d)=>%d\t\n", i, p.m, p.n, hash_table[i]->value );
     }
   }
   printf("\n");
