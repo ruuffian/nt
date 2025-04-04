@@ -1,9 +1,10 @@
 #include "hash_table.h"
 
-ack *hash_table[TABLE_SIZE];
+ack *hash_t[TABLE_SIZE];
 int main() {
-  init_hash_table();
-  print_hash_table();
+  hash_table table;
+  init_hash_table(&table, 15);
+  print_hash_table(table);
   ack zero_0 = { .pair={.m=0, .n=0}, .value=1};
   ack three_10 = { .pair={.m=3, .n=10}, .value=8189};
   ack  four_1 = { .pair={.m=4, .n=0}, .value=13};
@@ -12,6 +13,7 @@ int main() {
   hash_table_insert(&four_1);
   print_hash_table();
   // Does exist
+  /*
   ack *tmp = hash_table_lookup((pair){.m=3, .n=10});
   printf("Checking (3, 10):\t");
   if (tmp == NULL) {
@@ -42,32 +44,36 @@ int main() {
     printf("Deleted (%d, %d)\n", tmp->pair.m, tmp->pair.n);
   }
   print_hash_table();
+  */
   return 0;
 }
 
-void init_hash_table() {
-  for (int i=0; i < TABLE_SIZE; i++){
-    hash_table[i] = NULL;
-  }
+hash_table *init_hash_table(hash_table *hash_table, size_t size) {
+  hash_table->size = size;
+  // Allocate memory for *size* instances of *ack*.
+  hash_table->table = (ack **)calloc(TABLE_SIZE, sizeof(ack *));
+  if (hash_table->table == NULL) return NULL;
+  hash_table->table[size - 1] = NULL;
+  return hash_table;
 }
 
 bool hash_table_insert(ack *p) {
   if (p == NULL) return false;
   int index = hash(p->pair);
-  if (hash_table[index] != NULL) {
+  if (hash_t[index] != NULL) {
     return false;
   }
-  hash_table[index] = p;
+  hash_t[index] = p;
   return true;
 }
 
 ack *hash_table_delete(ack *p) {
   if (p == NULL) return NULL;
   int index = hash(p->pair);
-  if (hash_table[index] != NULL &&
-    pair_cmp(hash_table[index]->pair, p->pair) == 0) {
-    ack *tmp = hash_table[index];
-    hash_table[index] = NULL;
+  if (hash_t[index] != NULL &&
+    pair_cmp(hash_t[index]->pair, p->pair) == 0) {
+    ack *tmp = hash_t[index];
+    hash_t[index] = NULL;
     return tmp;
   }
   return NULL;
@@ -75,8 +81,8 @@ ack *hash_table_delete(ack *p) {
 
 ack *hash_table_lookup(pair p) {
   int index = hash(p);
-  if (hash_table[index] != NULL &&
-    pair_cmp(hash_table[index]->pair, p) == 0) return hash_table[index];
+  if (hash_t[index] != NULL &&
+    pair_cmp(hash_t[index]->pair, p) == 0) return hash_t[index];
   return NULL;
 }
 
@@ -91,14 +97,14 @@ int pair_cmp(pair p1, pair p2) {
   return 1;
 }
 
-void print_hash_table() {
-  printf("\tHash\t---\tPair\t\n");
-  for (int i=0; i < TABLE_SIZE; i++) {
-    if (hash_table[i] == NULL) {
+void print_hash_table(hash_table hash_table) {
+  printf("\tIndex\t---\tAck\t\n");
+  for (int i=0; i < hash_table.size; i++) {
+    if (hash_table.table[i] == NULL) {
       printf("\t%i\t---\n", i);
     } else {
-      pair p = hash_table[i]->pair;
-      printf("\t%i\t---\t(%d, %d)=>%d\t\n", i, p.m, p.n, hash_table[i]->value );
+      ack *a = hash_table.table[i];
+      printf("\t%i\t---\t(%d, %d)=>%d\t\n", i, a->pair.m, a->pair.n, a->value);
     }
   }
   printf("\n");
