@@ -7,9 +7,9 @@ build/main.o: main.c
 	gcc -c main.c -o build/main.o
 
 main: build/main.o build/ackermann.o 
-	gcc -o ack build/main.o build/ackermann.o 
+	gcc build/main.o build/ackermann.o 
 
 clean:
-	rm -rf ack build/ && mkdir build
+	rm -rf *.out build/ && mkdir build
 
 .PHONY: all clean
