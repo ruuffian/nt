@@ -12,7 +12,7 @@ typedef struct {
 
 typedef struct {
   pair pair;
-  unsigned long value;
+  long value;
 } ack;
 
 typedef struct {

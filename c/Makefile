@@ -1,6 +1,6 @@
 CC= gcc
 RM= rm -rf
-CFLAGS= -g -Wall -Wextra -Werror
+CFLAGS= -Wall -Wextra -Werror
 INCLUDEDIR= ./libht
 LIBDIR= ./libht
 LIBS= -lht
@@ -8,11 +8,17 @@ LIBS= -lht
 
 all : ack 
 
+debug: ack.c debug-ackermann.o
+	$(CC) $(CFLAGS) -g ackermann.o ack.c -I$(INCLUDEDIR) -L$(LIBDIR) $(LIBS) -o ack
+
+debug-ackermann.o:
+	gcc $(CFLAGS) -g -c ackermann.c -I$(INCLUDEDIR) -o ackermann.o
+
 ackermann.o:
-	gcc $(CFLAGS) -c ackermann.c -I$(INCLUDEDIR) -o ackermann.o
+	gcc $(CFLAGS) -O3 -c ackermann.c -I$(INCLUDEDIR) -o ackermann.o
 
 ack: ack.c ackermann.o
-	$(CC) $(CFLAGS) ackermann.o ack.c -I$(INCLUDEDIR) -L$(LIBDIR) $(LIBS) -o ack
+	$(CC) $(CFLAGS) -O3 ackermann.o ack.c -I$(INCLUDEDIR) -L$(LIBDIR) $(LIBS) -o ack
 
 clean:
 	$(RM) ack *.o

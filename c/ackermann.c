@@ -49,15 +49,15 @@ long _memoized(int m, int n, hash_table *table) {
 }
 
 void _cache_ack(hash_table *table, long value, pair key) {
-    ack *ack = malloc(sizeof(ack));
-    if (ack == NULL) {
+    ack *cache = malloc(sizeof(ack));
+    if (cache == NULL) {
       fprintf(stderr, "Memory allocation failed.\n");
       abort();
       /* NOT REACHED */
     }
-    ack->value = value;
-    ack->pair = key;
-    if(hash_table_insert(table, key, ack) == false) {
+    cache->pair = key;
+    cache->value = value;
+    if(hash_table_insert(table, key, cache) == false) {
       fprintf(stderr, "Failed to insert into cache.\n");
       abort();
       /* NOT REACHED */
