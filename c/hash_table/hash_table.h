@@ -22,12 +22,12 @@ typedef struct {
   size_t size;
 } hash_table;
 
-// Initializes a hash_table struct. Remember to free() when done.
-hash_table *init_hash_table(hash_table *, size_t);
-ack *hash_table_lookup(pair);
-bool hash_table_insert(ack *);
+hash_table *hash_table_create(size_t);
+void hash_table_destroy(hash_table *);
+bool hash_table_insert(hash_table *, ack *);
+ack *hash_table_lookup(hash_table *, pair);
 ack *hash_table_delete(ack *);
-void print_hash_table(hash_table);
+void print_hash_table(hash_table *);
 int pair_cmp(pair p1, pair p2);
-unsigned int hash(pair); 
+unsigned int hash(pair, size_t); 
 #endif
