@@ -6,13 +6,13 @@
 #include <stdbool.h>
 
 typedef struct {
-  int m;
-  int n;
+  unsigned int m;
+  unsigned int n;
 } pair;
 
 typedef struct {
   pair pair;
-  int value;
+  unsigned long value;
 } ack;
 
 typedef struct {
@@ -24,15 +24,24 @@ typedef struct {
  * Initialize a hash_table that can contain 'size' elements.
  */
 hash_table *hash_table_create(size_t size);
+
 /**
- * Frees a hash_table.
+ * Frees a hash_table. If the table contains heap-allocated memory, it MUST
+ * be free()-d before invoking this function.
  */
 void hash_table_destroy(hash_table *ht);
+
 /**
  * Associate key -> value in ht. Returns true if successful, false otherwise
  */
 bool hash_table_insert(hash_table *ht, pair key, ack *value);
+
+/** 
+ * Lookup a key in a hash_table. If 'key' is found in the table, returns the 
+ * value associted with it. Otherwise, returns NULL.
+ */
 ack *hash_table_lookup(hash_table *ht, pair key);
+
 /**
  * Remove the value associated with 'key' from the given hash_table. If 
  * 'key' or 'ht' are null or no value is associated with 'key' in the table,
@@ -40,14 +49,17 @@ ack *hash_table_lookup(hash_table *ht, pair key);
  * to free() this value if it was allocated on the heap.
  */
 ack *hash_table_delete(hash_table *ht, pair key);
+
 /**
  * Prints a hash_table to stdout.
  */
 void print_hash_table(hash_table *ht);
+
 /**
  * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
  */
 static int _pair_cmp(pair p1, pair p2);
+
 /**
   * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
   * elements.

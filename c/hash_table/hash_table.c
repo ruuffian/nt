@@ -1,7 +1,7 @@
 #include "hash_table.h"
 
 int main() {
-  hash_table *table = hash_table_create(15);
+  hash_table *table = hash_table_create(8);
   if (table == NULL) printf("Failed to create hash table...");
   print_hash_table(table);
   ack zero_0 = { .pair={.m=0, .n=0}, .value=1};
@@ -20,7 +20,7 @@ int main() {
   if (tmp == NULL) {
     printf("Could not find (3,10)...something is wrong.\n");
   } else {
-    printf("(%d, %d) => %d\n", tmp->pair.m, tmp->pair.n, tmp->value);
+    printf("(%d, %d) => %ld\n", tmp->pair.m, tmp->pair.n, tmp->value);
   }
   // Doesn't exist
   tmp = hash_table_lookup(table, ten_3.pair);
@@ -30,7 +30,7 @@ int main() {
   } else {
     printf("Found (10, 3)...something went wrong.\n");
   }
-  printf("Deleting (3, 10):\t");
+  printf("Deleting (3, 10)...\n");
   tmp = hash_table_delete(table, three_10.pair);
   if (tmp == NULL) {
     printf("Could not find (3,10)...something bad happened.\n");
@@ -55,7 +55,10 @@ hash_table *hash_table_create(size_t size) {
   if (ht == NULL) return NULL;
   ht->size = size;
   ht->table = (ack **)calloc(size, sizeof(ack *));
-  if (ht->table == NULL) return NULL;
+  if (ht->table == NULL) {
+    free(ht);
+    return NULL;
+  }
   return ht;
 }
 
@@ -100,7 +103,7 @@ void print_hash_table(hash_table *ht) {
       printf("\t%i\t---\n", i);
     } else {
       ack *a = ht->table[i];
-      printf("\t%i\t---\t(%d, %d)=>%d\t\n", i, a->pair.m, a->pair.n, a->value);
+      printf("\t%i\t---\t(%d, %d)=>%ld\t\n", i, a->pair.m, a->pair.n, a->value);
     }
   }
   printf("\n");
