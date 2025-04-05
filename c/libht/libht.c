@@ -32,9 +32,10 @@ void hash_table_destroy(hash_table *ht) {
 bool hash_table_insert(hash_table *ht, pair key, ack *value) {
   if (ht == NULL || value == NULL) return false;
   int index = _hash(key, ht->size);
+  /* This currently rejects on collisions, but it should chain/probe instead.
   if (ht->table[index] != NULL) {
     return false;
-  }
+  }*/
   ht->table[index] = value;
   return true;
 }
