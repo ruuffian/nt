@@ -81,7 +81,12 @@ int main(int argc, char *argv[]) {
       val = iterative(m, n);
       break;
     case MEMOIZED:
-      val = memoized(m, n);
+      hash_table *t = hash_table_create(100);
+      if (t == NULL) {
+        fprintf(stderr, "Failed to create hash table.");
+        abort();
+      }
+      val = memoized(m, n, t);
       break;
   }
   fprintf(stdout, "Ackermann(%i, %i) = %ld\n", m, n, val);

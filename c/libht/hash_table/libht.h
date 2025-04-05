@@ -1,6 +1,9 @@
 #ifndef __HASH_TABLE_H
 #define __HASH_TABLE_H
 
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef struct {
   unsigned int m;

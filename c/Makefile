@@ -5,11 +5,11 @@ CFLAGS= -g -Wall -Wextra -Werror
 
 all : ack 
 
-ackermann.o: ackermann.c ackermann.h
-	gcc -c ackermann.c 
+ackermann.o:
+	gcc $(CFLAGS) -c ackermann.c -Ihash_table -o ackermann.o
 
 ack: ack.c ackermann.o 
-	$(CC) $(CFLAGS) ackermann.o ack.c -Lhash_table -lht -o ack
+	$(CC) $(CFLAGS) ackermann.o ack.c -Ihash_table -Lhash_table -lht -o ack
 
 clean:
 	$(RM) ack *.o

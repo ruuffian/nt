@@ -1,8 +1,4 @@
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "hash_table.h"
+#include "libht.h"
 
 /**
  * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
