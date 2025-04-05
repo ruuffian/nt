@@ -20,6 +20,7 @@
 #include "ackermann.h"
 
 void usage(void);
+double _get_time();
 
 typedef enum {
   NAIVE,
@@ -73,23 +74,28 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Invalid argument passed for 'n'.");
   }
   long val;
+  ackermann_fn fn;
   switch (algorithm) {
     case NAIVE:
-      val = naive(m, n);
+      fn = &naive;
       break;
     case ITERATIVE:
-      val = iterative(m, n);
+      fn = &iterative;
       break;
     case MEMOIZED:
-      hash_table *t = hash_table_create(100);
-      if (t == NULL) {
-        fprintf(stderr, "Failed to create hash table.");
-        abort();
-      }
-      val = memoized(m, n, t);
+      fn = &memoized;
       break;
+    default:
+      abort();
+      /* NOT REACHED */
   }
+  double start, end, delta;
+  start = _get_time();
+  val = (*fn)(m, n);
+  end = _get_time();
+  delta = (end - start) / (double) 1000;
   fprintf(stdout, "Ackermann(%i, %i) = %ld\n", m, n, val);
+  fprintf(stdout, "Runtime: %f (ms)\n", delta);
   return EXIT_SUCCESS;
 }
 
@@ -101,3 +107,9 @@ void usage(void) {
   exit(EXIT_FAILURE);
 }
 
+double _get_time() {
+  struct timeval t;
+  struct timezone tzp;
+  gettimeofday(&t, &tzp);
+  return t.tv_sec*1e6 + t.tv_usec;
+}

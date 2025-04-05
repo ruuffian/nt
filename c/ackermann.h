@@ -9,7 +9,7 @@
 typedef long (*ackermann_fn)(int, int);
 
 long naive(int, int);
-long memoized(int, int, hash_table *);
+long memoized(int, int);
 long iterative(int, int);
 
 #endif
