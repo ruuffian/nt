@@ -4,16 +4,16 @@ from utils import count_calls
 
 # ----- ALGORITHMS ----
 @count_calls
-def A(m, n):
+def naive(m, n):
     """Naive Ackermann function implementation."""
     if m == 0:
         return n + 1
     if n == 0:
-        return A(m-1, 1)
-    return A(m-1, A(m, n-1))
+        return naive(m-1, 1)
+    return naive(m-1, naive(m, n-1))
 
 
-def memoized_A(m, n, count=False):
+def memoized(m, n, count=False):
     """Utilizes a cache to skip branches after computing them once."""
     cache = {}
 
@@ -34,12 +34,12 @@ def memoized_A(m, n, count=False):
             cache[(m, n)] = val
             return val
     val = _(m, n)
-    memoized_A.calls = _.calls
+    memoized.calls = _.calls
     return val
 
 
 @count_calls
-def iterative_A(i, n):
+def iterative(i, n):
     """I read this in a paper and wanted to try implementing it with numpy"""
     next = np.arange(i+1) * 0
     goal = np.arange(i+1) * 0 + 1

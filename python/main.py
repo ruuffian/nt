@@ -4,32 +4,15 @@ import timeit
 import time
 import argparse
 import numpy as np
-from ackermann import A, memoized_A, iterative_A
+from ackermann import naive, memoized, iterative
 
 # ----- GLOBALS -----
 M = 0
 N = 0
-ITERATIONS = 100
+ITERATIONS = 0
 
 
 # ----- BENCHMARKING ------
-def run_benchmark(fn, fn_str, descriptor, *args):
-    """Run a function with recursive tracking, then benchmark it.
-    Requres fn to be decorated with '@count_calls'.
-    """
-    print(f'{fn_str}({M},{N}) => {{')
-    start = time.perf_counter_ns()
-    val = fn(*args)
-    end = time.perf_counter_ns()
-    calls = fn.calls
-    print(f'\tFunction Return: {val}')
-    print(f'\tTotal Recursive Calls: {calls}')
-    print(f'\tRuntime: {(end - start) / 1e6} (ms)')
-    print(f'\tBenchmarking {descriptor} alg...')
-    marks = benchmark(fn_str)
-    report_marks(fn_str, marks)
-
-
 def benchmark(fn_str):
     """Coordinate calls on a function."""
     marks = timeit.repeat(stmt=f'{fn_str}(M, N)',
@@ -50,7 +33,6 @@ def report_marks(fn_str, marks):
     print(f'\t\tVariance:  {variance}')
     print(f'\t\tStandard Deviation:  {std_dev}')
     print('\t}')
-    print('}')
 
 
 # ----- DATA ANALYSIS ------
@@ -68,9 +50,28 @@ def analyze_marks(raw_marks):
 def main():
     # Default recursion limit too low for the Ackermann function
     sys.setrecursionlimit(10**6)
-    run_benchmark(iterative_A, 'iterative_A', 'Grossman-Zeitman', M, N)
-    run_benchmark(memoized_A, 'memoized_A', 'cache-optimized', M, N)
-    run_benchmark(A, 'A', 'naive', M, N)
+    print(f'{ALGORITHM}({M},{N}) => {{')
+    fn = naive
+    match ALGORITHM:
+        case 'naive':
+            fn = naive
+        case 'memoized':
+            fn = memoized
+        case 'iterative':
+            fn = iterative
+
+    start = time.perf_counter_ns()
+    val = fn(M, N)
+    end = time.perf_counter_ns()
+    calls = fn.calls
+    print(f'\tFunction Return: {val}')
+    print(f'\tTotal Recursive Calls: {calls}')
+    print(f'\tRuntime: {(end - start) / 1e6} (ms)')
+    if ITERATIONS > 0:
+        print(f'\tBenchmarking {ALGORITHM} alg...')
+        marks = benchmark(ALGORITHM)
+        report_marks(ALGORITHM, marks)
+    print('}')
 
 
 if __name__ == "__main__":
@@ -93,11 +94,18 @@ if __name__ == "__main__":
         '-l',
         type=int,
         help='The number of iterations to use for benchmarking.',
-        default=100
-
+        default=0
+    )
+    parser.add_argument(
+        '--algorithm',
+        '-a',
+        help='Choosing the algorithm to calculate with.',
+        choices=['naive', 'memoized', 'iterative'],
+        default='naive',
     )
     args = vars(parser.parse_args())
     M = args['m']
     N = args['n']
     ITERATIONS = args['loops']
+    ALGORITHM = args['algorithm']
     main()

@@ -29,9 +29,3 @@ void run_mark(struct mark *mark, a_t fn, int m, int n) {
   mark->val = val;
 }
 
-double get_time() {
-  struct timeval t;
-  struct timezone tzp;
-  gettimeofday(&t, &tzp);
-  return t.tv_sec*1e6 + t.tv_usec;
-}
