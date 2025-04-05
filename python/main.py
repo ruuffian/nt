@@ -52,7 +52,6 @@ def main():
     # Default recursion limit too low for the Ackermann function
     sys.setrecursionlimit(10**6)
     print(f'{ALGORITHM}({M},{N}) => {{')
-    fn = naive
     match ALGORITHM:
         case 'naive':
             fn = naive
