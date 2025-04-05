@@ -58,11 +58,11 @@ void print_hash_table(hash_table *ht);
 /**
  * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
  */
-static int _pair_cmp(pair p1, pair p2);
+int _pair_cmp(pair p1, pair p2);
 
 /**
   * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
   * elements.
   */
-static unsigned int _hash(pair key, size_t size); 
+unsigned int _hash(pair key, size_t size); 
 #endif
