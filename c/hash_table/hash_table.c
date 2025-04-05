@@ -1,4 +1,19 @@
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "hash_table.h"
+
+/**
+ * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
+ */
+int _pair_cmp(pair p1, pair p2);
+
+/**
+  * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
+  * elements.
+  */
+unsigned int _hash(pair key, size_t size); 
 
 hash_table *hash_table_create(size_t size) {
   hash_table *ht;

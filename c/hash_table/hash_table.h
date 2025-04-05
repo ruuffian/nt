@@ -1,9 +1,6 @@
 #ifndef __HASH_TABLE_H
 #define __HASH_TABLE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 
 typedef struct {
   unsigned int m;
@@ -54,15 +51,4 @@ ack *hash_table_delete(hash_table *ht, pair key);
  * Prints a hash_table to stdout.
  */
 void print_hash_table(hash_table *ht);
-
-/**
- * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
- */
-int _pair_cmp(pair p1, pair p2);
-
-/**
-  * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
-  * elements.
-  */
-unsigned int _hash(pair key, size_t size); 
 #endif

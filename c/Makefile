@@ -1,15 +1,15 @@
-all : main
+CC= gcc
+RM= rm -rf
+CFLAGS= -g -Wall -Wextra -Werror
+.PHONY: all clean
 
-build/ackermann.o: ackermann.c ackermann.h
-	gcc -c ackermann.c -o build/ackermann.o
+all : ack 
 
-build/main.o: main.c
-	gcc -c main.c -o build/main.o
+ackermann.o: ackermann.c ackermann.h
+	gcc -c ackermann.c 
 
-main: build/main.o build/ackermann.o 
-	gcc build/main.o build/ackermann.o 
+ack: ack.c ackermann.o 
+	$(CC) $(CFLAGS) ackermann.o ack.c -Lhash_table -lht -o ack
 
 clean:
-	rm -rf *.out build/ && mkdir build
-
-.PHONY: all clean
+	$(RM) ack *.o
