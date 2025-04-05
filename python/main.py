@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Computes and Benchmarks the Ackermann function:
 import sys
 import timeit
