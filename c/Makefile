@@ -22,6 +22,7 @@ ack: ack.c ackermann.o
 	$(CC) $(CFLAGS) -O3 ackermann.o ack.c $(INCLUDEDIRS) $(LIBDIRS) $(LIBS) -o ack
 
 clean:
+	cd libht && make $@
 	$(RM) ack *.o
 
 build: clean
