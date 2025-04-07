@@ -5,7 +5,7 @@ import timeit
 import time
 import argparse
 import numpy as np
-from ackermann import naive, memoized, iterative
+from ackermann import naive, lru, memoized, iterative
 
 # ----- GLOBALS -----
 M = 0
@@ -16,8 +16,13 @@ ITERATIONS = 0
 # ----- BENCHMARKING ------
 def benchmark(fn_str):
     """Coordinate calls on a function."""
+    SETUP = f"""
+if ALGORITHM == 'lru':
+    {fn_str}.cache_clear()
+"""
     marks = timeit.repeat(stmt=f'{fn_str}(M, N)',
                           globals=globals(),
+                          setup=SETUP,
                           repeat=ITERATIONS,
                           number=1)
     return marks
@@ -51,21 +56,22 @@ def analyze_marks(raw_marks):
 def main():
     # Default recursion limit too low for the Ackermann function
     sys.setrecursionlimit(10**6)
+    fns = {
+        'naive': naive,
+        'memoized': memoized,
+        'lru': lru,
+        'iterative': iterative
+    }
     print(f'{ALGORITHM}({M},{N}) => {{')
-    match ALGORITHM:
-        case 'naive':
-            fn = naive
-        case 'memoized':
-            fn = memoized
-        case 'iterative':
-            fn = iterative
-
+    fn = fns[ALGORITHM]
+    m = M
+    n = N
     start = time.perf_counter_ns()
-    val = fn(M, N)
+    val = fn(m, n)
     end = time.perf_counter_ns()
-    calls = fn.calls
+    # calls = fn.calls
     print(f'\tFunction Return: {val}')
-    print(f'\tTotal Recursive Calls: {calls}')
+    # print(f'\tTotal Recursive Calls: {calls}')
     print(f'\tRuntime: {(end - start) / 1e6} (ms)')
     if ITERATIONS > 0:
         print(f'\tBenchmarking {ALGORITHM} alg...')
@@ -100,7 +106,7 @@ if __name__ == "__main__":
         '--algorithm',
         '-a',
         help='Choosing the algorithm to calculate with.',
-        choices=['naive', 'memoized', 'iterative'],
+        choices=['naive', 'memoized', 'iterative', 'lru'],
         default='naive',
     )
     args = vars(parser.parse_args())
