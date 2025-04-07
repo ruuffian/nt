@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cache 
 
 
 # ----- ALGORITHMS ----
@@ -11,7 +11,7 @@ def naive(m, n):
     return naive(m-1, naive(m, n-1))
 
 
-@lru_cache()
+@cache
 def lru(m, n):
     """Despite being about a millisecond faster than the home-grown
     memoization, this function absolutely explodes as soon as you give it more

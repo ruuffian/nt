@@ -30,15 +30,15 @@ if ALGORITHM == 'lru':
 
 def report_marks(fn_str, marks):
     times, avg, min, max, median, variance, std_dev = analyze_marks(marks)
-    print(f'\tRuntime Metrics [{len(times)} loops] => {{')
-    print(f'\t\tPeek (top 5): {sorted(times, reverse=True)[0:5]}')
-    print(f'\t\tAverage: {avg} ms')
-    print(f'\t\tMedian: {median} ms')
-    print(f'\t\tMin time:  {min} ms')
-    print(f'\t\tMax time:  {max} ms')
-    print(f'\t\tVariance:  {variance}')
-    print(f'\t\tStandard Deviation:  {std_dev}')
-    print('\t}')
+    print(f'Runtime Metrics [{len(times)} loops] => {{')
+    print(f'\tPeek (top 5): {sorted(times, reverse=True)[0:5]}')
+    print(f'\tAverage: {avg} (ms)')
+    print(f'\tMedian: {median} (ms)')
+    print(f'\tMin time:  {min} (ms)')
+    print(f'\tMax time:  {max} (ms)')
+    print(f'\tVariance:  {variance}')
+    print(f'\tStandard Deviation:  {std_dev}')
+    print('}')
 
 
 # ----- DATA ANALYSIS ------
@@ -62,7 +62,7 @@ def main():
         'lru': lru,
         'iterative': iterative
     }
-    print(f'{ALGORITHM}({M},{N}) => {{')
+    print(f'{ALGORITHM}({M},{N})=', end=' ')
     fn = fns[ALGORITHM]
     m = M
     n = N
@@ -70,14 +70,13 @@ def main():
     val = fn(m, n)
     end = time.perf_counter_ns()
     # calls = fn.calls
-    print(f'\tFunction Return: {val}')
+    print(val)
     # print(f'\tTotal Recursive Calls: {calls}')
-    print(f'\tRuntime: {(end - start) / 1e6} (ms)')
+    print(f'Runtime: {(end - start) / 1e6} (ms)')
     if ITERATIONS > 0:
-        print(f'\tBenchmarking {ALGORITHM} alg...')
+        print(f'Benchmarking {ALGORITHM} alg...')
         marks = benchmark(ALGORITHM)
         report_marks(ALGORITHM, marks)
-    print('}')
 
 
 if __name__ == "__main__":
