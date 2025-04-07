@@ -1,7 +1,7 @@
 #include "ackermann.h"
 
 /* Allocates an 'ack' on the heap and associates it with a given key */
-void _cache_ack(hash_table *table, uint64_t value, pair key);
+void _cache_ack(hash_table *table, uint64_t value, key key);
 /* Internal memoized ackermann calculation */
 uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table);
 
@@ -30,8 +30,8 @@ uint64_t memoized(uint64_t m, uint64_t n) {
 }
 
 uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table) {
-  pair key = {.m=m, .n=n};
-  ack *cached = hash_table_lookup(table, key);
+  key key = {.m=m, .n=n};
+  entry *cached = hash_table_lookup(table, key);
   if (cached != NULL) 
     return cached->value;
   if (m == 0) {
@@ -50,14 +50,14 @@ uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table) {
   }
 }
 
-void _cache_ack(hash_table *table, uint64_t value, pair key) {
-    ack *cache = malloc(sizeof(ack));
+void _cache_ack(hash_table *table, uint64_t value, key key) {
+    entry *cache = malloc(sizeof(entry));
     if (cache == NULL) {
       fprintf(stderr, "Memory allocation failed.\n");
       abort();
       /* NOT REACHED */
     }
-    cache->pair = key;
+    cache->key = key;
     cache->value = value;
     if(hash_table_insert(table, key, cache) == false) {
       fprintf(stderr, "Failed to insert into cache.\n");

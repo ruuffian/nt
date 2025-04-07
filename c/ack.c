@@ -92,10 +92,14 @@ int main(int argc, char *argv[]) {
   uint64_t m = strtol(argv[0], &tmp, 10);
   if (tmp == argv[0] || *tmp != '\0') {
     fprintf(stderr, "Invalid argument passed for 'm'.");
+    usage();
+    /* NOT REACHED */
   }
   uint64_t n = strtol(argv[1], &tmp, 10);
   if (tmp == argv[1] || *tmp != '\0') {
     fprintf(stderr, "Invalid argument passed for 'n'.");
+    usage();
+    /* NOT REACHED */
   }
   /* Select algorithm- I'm almost positive there's an easier way. */
   ackermann_fn fn;

@@ -3,20 +3,20 @@
 /**
  * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
  */
-int _pair_cmp(pair p1, pair p2);
+int _keycmp(key p1, key p2);
 
 /**
   * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
   * elements.
   */
-uint64_t _hash(pair key, size_t size); 
+uint64_t _keyhash(key key, size_t size); 
 
 hash_table *hash_table_create(size_t size) {
   hash_table *ht;
   ht = malloc(sizeof(hash_table));
   if (ht == NULL) return NULL;
   ht->size = size;
-  ht->table = (ack **)calloc(size, sizeof(ack *));
+  ht->table = (entry **)calloc(size, sizeof(entry *));
   if (ht->table == NULL) {
     free(ht);
     return NULL;
@@ -32,57 +32,53 @@ void hash_table_destroy(hash_table *ht) {
   free(ht);
 }
 
-bool hash_table_insert(hash_table *ht, pair key, ack *value) {
-  if (ht == NULL || value == NULL) return false;
-  uint64_t index = _hash(key, ht->size);
-  /* This currently rejects on collisions, but it should chain/probe instead.
-  if (ht->table[index] != NULL) {
-    return false;
-  }*/
-  ht->table[index] = value;
+bool hash_table_insert(hash_table *ht, key key, entry *v) {
+  if (ht == NULL || v == NULL) return false;
+  uint64_t index = _keyhash(key, ht->size);
+  ht->table[index] = v;
   return true;
 }
 
-ack *hash_table_delete(hash_table *ht, pair pair) {
+entry *hash_table_delete(hash_table *ht, key key) {
   if (ht == NULL) return NULL;
-  uint64_t index = _hash(pair, ht->size);
-  if (ht->table[index] != NULL &&
-    _pair_cmp(ht->table[index]->pair, pair) == 0) {
-    ack *tmp = ht->table[index];
-    ht->table[index] = NULL;
+  uint64_t idx = _keyhash(key, ht->size);
+  if (ht->table[idx] != NULL &&
+    _keycmp(ht->table[idx]->key, key) == 0) {
+    entry *tmp = ht->table[idx];
+    ht->table[idx] = NULL;
     return tmp;
   }
   return NULL; 
 }
 
-ack *hash_table_lookup(hash_table * ht, pair pair) {
-  uint64_t index = _hash(pair, ht->size);
+entry *hash_table_lookup(hash_table * ht, key key) {
+  uint64_t index = _keyhash(key, ht->size);
   if (ht->table[index] != NULL &&
-    _pair_cmp(ht->table[index]->pair, pair) == 0) return ht->table[index];
+    _keycmp(ht->table[index]->key, key) == 0) return ht->table[index];
   return NULL;
 }
 
 void print_hash_table(hash_table *ht) {
-  printf("\tIndex\t---\tAck\t\n");
+  printf("\tHash\t---\tEntry\t\n");
   size_t i;
   for (i=0; i < ht->size; i++) {
     if (ht->table[i] == NULL) {
       printf("\t%ld\t---\n", i);
     } else {
-      ack *a = ht->table[i];
-      printf("\t%ld\t---\t(%ld, %ld)=>%ld\t\n", i, a->pair.m, a->pair.n, a->value);
+      entry *a = ht->table[i];
+      printf("\t%ld\t---\t(%ld, %ld)=>%ld\t\n", i, a->key.m, a->key.n, a->value);
     }
   }
   printf("\n");
 }
 
-uint64_t _hash(pair pair, size_t size) {
-  uint64_t m = pair.m;
-  uint64_t n = pair.n;
-  return ((m*m + m + 2*m*n + 3*n + n*n) / 2) % size;
+uint64_t _keyhash(key key, size_t size) {
+  uint64_t m = key.m;
+  uint64_t n = key.n;
+  return ((((m + n + 1)*(m + n))/2) + n) % size;
 }
 
-int _pair_cmp(pair p1, pair p2) {
-  if (p1.m == p2.m && p1.n == p2.n) return 0;
+int _keycmp(key k1, key k2) {
+  if (k1.m == k2.m && k1.n == k2.n) return 0;
   return 1;
 }

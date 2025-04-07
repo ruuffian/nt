@@ -19,19 +19,19 @@
 typedef struct {
   uint64_t m;
   uint64_t n;
-} pair;
+} key;
 
 /* Table value type- we store the key in the value to double check the value
  * stored at the hashed index is actually the one we like, in case of
  * collisions.
  */
 typedef struct {
-  pair pair;
+  key key;
   uint64_t value;
-} ack;
+} entry;
 
 typedef struct {
-  ack **table;
+  entry **table;
   size_t size;
 } hash_table;
 
@@ -49,13 +49,13 @@ void hash_table_destroy(hash_table *ht);
 /**
  * Associate key -> value in ht. Returns true if successful, false otherwise
  */
-bool hash_table_insert(hash_table *ht, pair key, ack *value);
+bool hash_table_insert(hash_table *ht, key key, entry *v);
 
 /** 
  * Lookup a key in a hash_table. If 'key' is found in the table, returns the 
  * value associted with it. Otherwise, returns NULL.
  */
-ack *hash_table_lookup(hash_table *ht, pair key);
+entry *hash_table_lookup(hash_table *ht, key key);
 
 /**
  * Remove the value associated with 'key' from the given hash_table. If 
@@ -63,10 +63,10 @@ ack *hash_table_lookup(hash_table *ht, pair key);
  * returns NULL. Otherwise, returns the value associated with 'key'. Remember
  * to free() this value if it was allocated on the heap.
  */
-ack *hash_table_delete(hash_table *ht, pair key);
+entry *hash_table_delete(hash_table *ht, key key);
 
 /**
  * Prints a hash_table to stdout.
  */
-void print_hash_table(hash_table *ht);
+void hash_table_print(hash_table *ht);
 #endif
