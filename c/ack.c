@@ -75,14 +75,18 @@ int main(int argc, char *argv[]) {
   }
   long val;
   ackermann_fn fn;
+  char *a;
   switch (algorithm) {
     case NAIVE:
+      a = "naive";
       fn = &naive;
       break;
     case ITERATIVE:
+      a = "iterative";
       fn = &iterative;
       break;
     case MEMOIZED:
+      a = "memoized";
       fn = &memoized;
       break;
     default:
@@ -94,7 +98,7 @@ int main(int argc, char *argv[]) {
   val = (*fn)(m, n);
   end = _get_time();
   delta = (end - start) / (double) 1000;
-  fprintf(stdout, "Ackermann(%i, %i) = %ld\n", m, n, val);
+  fprintf(stdout, "%s(%i, %i) = %ld\n", a, m, n, val);
   fprintf(stdout, "Runtime: %f (ms)\n", delta);
   return EXIT_SUCCESS;
 }

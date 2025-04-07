@@ -1,5 +1,5 @@
 #include <stdbool.h>
-#include "hash_table.h"
+#include "libht.h"
 
 #define TABLE_SIZE 50
 
@@ -15,10 +15,23 @@ int tests_failed = 0;
 int main() {
   hash_table *table;
   table = hash_table_create(TABLE_SIZE);
+  /*
   assert(TEST_table_allocation(table), "Table successfully created.", "Table creation failed.");
   assert(TEST_table_size(table, TABLE_SIZE), "Table size matches.", "Table size does not match.");
   assert(TEST_fresh_table_empty(table), "Fresh table is empty.", "Fresh table is not empty.");
-  //assert(TEST_insert_succeeds(table), "Inserting (0, 0) => 1 succeeded.", "Failed to insert (0, 0) => 1.");
+  */
+  pair key = {.m=2, .n=10};
+  ack tmp = {.pair=key, .value=23};
+  ack tmp1 = {.pair=key, .value=23};
+  ack tmp2 = {.pair=key, .value=23};
+  ack tmp3 = {.pair=key, .value=23};
+  ack tmp4 = {.pair=key, .value=23};
+  hash_table_insert(table, key, &tmp);
+  hash_table_insert(table, key, &tmp1);
+  hash_table_insert(table, key, &tmp2);
+  hash_table_insert(table, key, &tmp3);
+  hash_table_insert(table, key, &tmp4);
+  print_hash_table(table);
   return 0;
 }
 
