@@ -2,14 +2,19 @@
 #define _ACKERMANN_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "libht.h"
 
-typedef long (*ackermann_fn)(int, int);
+/* Contract for ackermann algorithms */
+typedef uint64_t (*ackermann_fn)(uint64_t, uint64_t);
 
-long naive(int, int);
-long memoized(int, int);
-long iterative(int, int);
+/* Pure recursive solution */
+uint64_t naive(uint64_t, uint64_t);
+/* Memoized solution */
+uint64_t memoized(uint64_t, uint64_t);
+/* Iterative solution */
+uint64_t iterative(uint64_t, uint64_t);
 
 #endif

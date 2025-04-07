@@ -22,16 +22,21 @@
 
 #define PEEK_SIZE 5
 
+/* Print application usage statement and terminate. */
 void usage(void);
-void _benchmark(ackermann_fn, int, int, int);
+/* Call fn(m, n) 'loops'-many times and print some basic analytics. */
+void _benchmark(ackermann_fn, uint64_t, uint64_t, int);
+/* Get the current time in nanoseconds */
 double _get_time();
 
+/* Available ackermann_fn algorithms */
 typedef enum {
   NAIVE,
   ITERATIVE,
   MEMOIZED 
 } algorithm_t;
 
+/* Global program name for usage() */
 char *_progname;
 
 int main(int argc, char *argv[]) {
@@ -74,22 +79,25 @@ int main(int argc, char *argv[]) {
         /* NOT REACHED */
     }
   }
+  /* We need to account for arguments parsed by getopt */
   argc -= optind;
   argv += optind;
+  /* M and N are required arguments */
   if (argc != 2) {
     usage();
     /* NOT REACHED */
   }
   /* Input validation */
   char *tmp;
-  int m = strtol(argv[0], &tmp, 10);
+  uint64_t m = strtol(argv[0], &tmp, 10);
   if (tmp == argv[0] || *tmp != '\0') {
     fprintf(stderr, "Invalid argument passed for 'm'.");
   }
-  int n = strtol(argv[1], &tmp, 10);
+  uint64_t n = strtol(argv[1], &tmp, 10);
   if (tmp == argv[1] || *tmp != '\0') {
     fprintf(stderr, "Invalid argument passed for 'n'.");
   }
+  /* Select algorithm- I'm almost positive there's an easier way. */
   ackermann_fn fn;
   char *a;
   switch (algorithm) {
@@ -109,22 +117,28 @@ int main(int argc, char *argv[]) {
       abort();
       /* NOT REACHED */
   }
+  /* Run the function once for quick feedback, then check for benchmarking */
   double start, end, delta;
   start = _get_time();
-  long val = (*fn)(m, n);
+  uint64_t val = (*fn)(m, n);
   end = _get_time();
   delta = (end - start) / (double) 1000;
-  fprintf(stdout, "%s(%i, %i) = %ld\n", a, m, n, val);
+  fprintf(stdout, "%s(%ld, %ld) = %ld\n", a, m, n, val);
   fprintf(stdout, "Runtime: %f (ms)\n", delta);
+  /* If user doesn't give  a loop value, don't benchmark. */
   if (loops != 0) {
     _benchmark(fn, m, n, loops);
   }
   return EXIT_SUCCESS;
 }
 
-void _benchmark(ackermann_fn fn, int m, int n, int loops) {
+void _benchmark(ackermann_fn fn, uint64_t m, uint64_t n, int loops) {
   int counter = 0;
   double *times = calloc(loops, sizeof(double));
+  if (times == NULL) {
+    fprintf(stderr, "Memory allocation failed.");
+    abort();
+  }
   double min = DBL_MAX, max = 0, sum = 0;
   /* int peek;
   if (loops < PEEK_SIZE) peek = loops;

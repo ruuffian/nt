@@ -1,18 +1,33 @@
+/* 
+* Author: Liam Mackay
+* Date: April 4th, 2025
+* Description: This is a C-implementation of a hash table, using a tuple of
+* ints as its key and a long as its value. Lookup performance is increidbly 
+* important to this implementation- external chaining and linear probing both
+* had extremely negative impacts on performance. It turns out that ackermann's
+* function's cache lookups are fairly local within the algorithm.
+*/
 #ifndef __HASH_TABLE_H
 #define __HASH_TABLE_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Table key type */
 typedef struct {
-  unsigned int m;
-  unsigned int n;
+  uint64_t m;
+  uint64_t n;
 } pair;
 
+/* Table value type- we store the key in the value to double check the value
+ * stored at the hashed index is actually the one we like, in case of
+ * collisions.
+ */
 typedef struct {
   pair pair;
-  long value;
+  uint64_t value;
 } ack;
 
 typedef struct {
