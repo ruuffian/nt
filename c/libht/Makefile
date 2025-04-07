@@ -14,9 +14,9 @@ debug: libht.c libht.h
 	ranlib libht.a
 
 libht: libht.c libht.h
-	$(CC) $(CFLAGS) -O3 -c libht.c -o libht.o
-	ar rv libht.a libht.o
-	ranlib libht.a
+	$(CC) $(CFLAGS) -flto -O3 -c libht.c -o libht.o
+	gcc-ar rv libht.a libht.o
+	gcc-ranlib libht.a
 
 clean: 
 	$(RM) *.o *.a test_libht

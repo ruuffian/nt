@@ -16,10 +16,13 @@ debug-ackermann.o: ackermann.c
 	gcc $(CFLAGS) -g -c ackermann.c $(INCLUDEDIRS) -o ackermann.o
 
 ackermann.o: ackermann.c
-	gcc $(CFLAGS) -O3 -c ackermann.c $(INCLUDEDIRS) -o ackermann.o
+	$(CC) $(CFLAGS) -flto -O3 -c ackermann.c $(INCLUDEDIRS) -o ackermann.o
 
-ack: ack.c ackermann.o
-	$(CC) $(CFLAGS) -O3 ackermann.o ack.c $(INCLUDEDIRS) $(LIBDIRS) $(LIBS) -o ack
+ack.o: ack.c
+	$(CC) $(CFLAGS) -flto -O3 -c ack.c $(INCLUDEDIRS) -o ack.o
+
+ack: ack.o ackermann.o
+	$(CC) -o ack $(CFLAGS) -O3 ackermann.o ack.o $(LIBDIRS) $(LIBS)
 
 clean:
 	cd libht && make $@
