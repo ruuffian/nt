@@ -1,2 +1,6 @@
 .venv
-build/**/*
+*.o
+*.a
+*.out
+*.so
+**pycache**
