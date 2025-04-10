@@ -1,4 +1,4 @@
-from functools import cache 
+from functools import cache
 
 
 # ----- ALGORITHMS ----
@@ -7,8 +7,8 @@ def naive(m, n):
     if m == 0:
         return n + 1
     if n == 0:
-        return naive(m-1, 1)
-    return naive(m-1, naive(m, n-1))
+        return naive(m - 1, 1)
+    return naive(m - 1, naive(m, n - 1))
 
 
 @cache
@@ -20,8 +20,8 @@ def lru(m, n):
     if m == 0:
         return n + 1
     if n == 0:
-        return lru(m-1, 1)
-    return lru(m-1, lru(m, n-1))
+        return lru(m - 1, 1)
+    return lru(m - 1, lru(m, n - 1))
 
 
 def memoized(m, n):
@@ -61,12 +61,13 @@ def memoized(m, n):
                 cache[key] = val
                 return val
             if n == 0:
-                val = _(m-1, 1)
+                val = _(m - 1, 1)
                 cache[key] = val
                 return val
-            val = _(m-1, _(m, n-1))
+            val = _(m - 1, _(m, n - 1))
             cache[key] = val
             return val
+
     return _(m, n)
 
 
@@ -77,8 +78,9 @@ def iterative(i, n):
     iterative anyways...hmm.
     """
     import numpy as np
-    next = np.arange(i+1) * 0
-    goal = np.arange(i+1) * 0 + 1
+
+    next = np.arange(i + 1) * 0
+    goal = np.arange(i + 1) * 0 + 1
     goal[i] = -1
     current = i
     while next[i] != n + 1:
@@ -86,10 +88,10 @@ def iterative(i, n):
         transferring = True
         current = i
         while transferring:
-            if next[i-current] == goal[i-current]:
-                goal[i-current] = value
+            if next[i - current] == goal[i - current]:
+                goal[i - current] = value
             else:
                 transferring = False
-            next[i-current] = next[i-current]+1
+            next[i - current] = next[i - current] + 1
             current -= 1
     return value

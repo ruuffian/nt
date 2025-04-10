@@ -10,7 +10,7 @@ SRCFILES := $(shell find $(SRC) -type f -name "*.c")
 OBJFILES := $(patsubst src/%.c,build/%.o, $(SRCFILES))
 # Compiler
 CC := gcc
-CFLAGS := -Wall -Wextra -Werror
+CFLAGS := -std=c99 -Wall -Wextra -Werror
 INCDIR := -I./include
 .PHONY: all clean dir build
 
@@ -19,6 +19,9 @@ all : $(NAME)
 
 debug : CFLAGS := $(CFLAGS) -g -Og
 debug : $(NAME)
+
+cc: clean 
+	bear -- make all
 
 $(NAME): dir $(OBJFILES)
 	$(CC) $(CFLAGS) $(OBJFILES) -o $(BIN)/$@
