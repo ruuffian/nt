@@ -1,33 +1,40 @@
-CC= gcc
-RM= rm -rf
-CFLAGS= -Wall -Wextra -Werror
-INCLUDEDIRS= -I./libht
-LIBDIRS= -L./libht
-LIBS= -lht
-.PHONY: all clean build
+# Project
+debug ?= 0
+NAME := ack
+SRC := src
+BIN := bin
+BUILD := build
+TEST := test
+# Generate object file paths
+SRCFILES := $(shell find $(SRC) -type f -name "*.c")
+OBJFILES := $(patsubst src/%.c,build/%.o, $(SRCFILES))
+# Compiler
+CC := gcc
+CFLAGS := -Wall -Wextra -Werror
+INCDIR := -I./include
+.PHONY: all clean dir build
 
-all : ack
+all : CFLAGS := $(CFLAGS) -O3
+all : $(NAME)
 
-debug: ack.c debug-ackermann.o
-	cd libht && make clean && make debug
-	$(CC) $(CFLAGS) -g ackermann.o ack.c $(INCLUDEDIRS) $(LIBDIRS) $(LIBS) -o ack
+debug : CFLAGS := $(CFLAGS) -g -Og
+debug : $(NAME)
 
-debug-ackermann.o: ackermann.c
-	gcc $(CFLAGS) -g -c ackermann.c $(INCLUDEDIRS) -o ackermann.o
+$(NAME): dir $(OBJFILES)
+	$(CC) $(CFLAGS) $(OBJFILES) -o $(BIN)/$@
 
-ackermann.o: ackermann.c
-	$(CC) $(CFLAGS) -flto -O3 -c ackermann.c $(INCLUDEDIRS) -o ackermann.o
+$(BUILD)/%.o: $(SRC)/%.c
+	$(CC) $(CFLAGS) $(INCDIR) -c $< -o $@
 
-ack.o: ack.c
-	$(CC) $(CFLAGS) -flto -O3 -c ack.c $(INCLUDEDIRS) -o ack.o
-
-ack: ack.o ackermann.o
-	$(CC) -o ack $(CFLAGS) -O3 ackermann.o ack.o $(LIBDIRS) $(LIBS)
+test: dir $(TEST)/test_hash_table.c
+	$(CC) $(CFLAGS) $(INCDIR) $(TEST)/test_hash_table.c $(SRC)/hash_table.c -o $(BIN)/test
 
 clean:
-	cd libht && make $@
-	$(RM) ack *.o
+	rm -rf $(BIN) $(BUILD)
 
-build: clean
-	cd libht && make $@
-	make all
+dir:
+	@mkdir -p $(BIN) $(BUILD)
+
+install:
+	@cp $(BIN)/$(NAME) /usr/local/bin/$(NAME)
+

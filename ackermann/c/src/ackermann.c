@@ -1,4 +1,8 @@
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "ackermann.h"
+#include "hash_table.h"
 
 /* Allocates an 'ack' on the heap and associates it with a given key */
 void _cache_ack(hash_table *table, uint64_t value, key key);
@@ -15,11 +19,11 @@ uint64_t naive(uint64_t m, uint64_t n) {
 }
 
 uint64_t memoized(uint64_t m, uint64_t n) {
-    hash_table *t = hash_table_create(100);
-    if (t == NULL) {
-      fprintf(stderr, "Failed to create hash table.");
-      abort();
-    }
+  hash_table *t = hash_table_create(100);
+  if (t == NULL) {
+    fprintf(stderr, "Failed to create hash table.");
+    abort();
+  }
   uint64_t val = _memoized(m, n, t);
   size_t i;
   for (i=0; i<t->size; i++) {
@@ -59,11 +63,13 @@ void _cache_ack(hash_table *table, uint64_t value, key key) {
     }
     cache->key = key;
     cache->value = value;
-    if(hash_table_insert(table, key, cache) == false) {
+    entry *tmp;
+    if((tmp = hash_table_insert(table, key, cache)) == NULL) {
       fprintf(stderr, "Failed to insert into cache.\n");
       abort();
       /* NOT REACHED */
     }
+    if (tmp != cache) free(tmp);
 }
 
 uint64_t iterative(uint64_t i, uint64_t n) {

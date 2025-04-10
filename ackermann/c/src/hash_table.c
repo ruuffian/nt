@@ -1,4 +1,4 @@
-#include "libht.h"
+#include "hash_table.h"
 
 /**
  * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
@@ -32,11 +32,13 @@ void hash_table_destroy(hash_table *ht) {
   free(ht);
 }
 
-bool hash_table_insert(hash_table *ht, key key, entry *v) {
-  if (ht == NULL || v == NULL) return false;
+entry *hash_table_insert(hash_table *ht, key key, entry *v) {
+  if (ht == NULL || v == NULL) return NULL;
   uint64_t index = _keyhash(key, ht->size);
+  entry *tmp = ht->table[index];
   ht->table[index] = v;
-  return true;
+  if (tmp == NULL) return v;
+  return tmp;
 }
 
 entry *hash_table_delete(hash_table *ht, key key) {
@@ -58,7 +60,7 @@ entry *hash_table_lookup(hash_table * ht, key key) {
   return NULL;
 }
 
-void print_hash_table(hash_table *ht) {
+void hash_table_print(hash_table *ht) {
   printf("\tHash\t---\tEntry\t\n");
   size_t i;
   for (i=0; i < ht->size; i++) {

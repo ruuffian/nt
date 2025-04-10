@@ -1,4 +1,25 @@
-#include "ack.h"
+/* 
+* Author: Liam Mackay
+* Date: April 4th, 2025
+* Description: This is a C-implementation of the Ackermann function, considered
+* to be the first discovered non-primitive recursive function. There are 
+* several implementations of this algorithm contained within, with various 
+* levels of optimizations applied to them. It is ill-advised to attempt to 
+* calucate beyond A(4,1) as A(4,2) has 19729 digits. Perhaps there is a 
+* concurrent algorithm that can compute this efficiently- it is unknown to me.
+*/
+#include <sys/time.h>
+#include <sys/resource.h>
+
+#include <ctype.h>
+#include <float.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include "ackermann.h"
+
+#define STACK_SIZE 16
 
 /* Print application usage statement and terminate. */
 void usage(void);
@@ -22,7 +43,9 @@ int main(int argc, char *argv[]) {
   int c;
   algorithm_t algorithm = NAIVE;
   int loops = 0;
-  while ((c = getopt (argc, argv, ":himl:")) != -1) {
+  rlim_t stack_size = STACK_SIZE;
+  char *tmp;
+  while ((c = getopt (argc, argv, ":himl:s:")) != -1) {
     switch(c) {
       case 'h':
         usage();
@@ -35,16 +58,30 @@ int main(int argc, char *argv[]) {
         algorithm = MEMOIZED;
         break;
       case 'l':
-        char * tmp1;
-        int l = strtol(optarg, &tmp1, 10);
-        if (tmp1 == optarg || *tmp1 != '\0') {
-          fprintf(stderr, "Invalid argument passed for 'l'.");
+        int l = strtol(optarg, &tmp, 10);
+        if (tmp == optarg || *tmp != '\0') {
+          fprintf(stderr, "Invalid argument passed for 'l'.\n");
           return EXIT_FAILURE;
         } else if (loops < 0) {
-          fprintf(stderr, "'l' value must be greater than 0.");
+          fprintf(stderr, "'l' value must be greater than 0.\n");
           return EXIT_FAILURE;
         }
         loops = l;
+        break;
+      case 's':
+        int s = strtol(optarg, &tmp, 10);
+        if (tmp == optarg || *tmp != '\0') {
+          fprintf(stderr, "Invalid argument passed for 's'.\n");
+          return EXIT_FAILURE;
+        } else if (s < 0) {
+          fprintf(stderr, "'s' value must be greater than 0.\n");
+          return EXIT_FAILURE;
+        }
+        if (s > 1024) {
+          fprintf(stderr, "'s' value must be less than 1024.\n");
+          return EXIT_FAILURE;
+        }
+        stack_size = s;
         break;
       case '?':
         if (isprint(optopt)) 
@@ -66,7 +103,6 @@ int main(int argc, char *argv[]) {
     /* NOT REACHED */
   }
   /* Input validation */
-  char *tmp;
   uint64_t m = strtol(argv[0], &tmp, 10);
   if (tmp == argv[0] || *tmp != '\0') {
     fprintf(stderr, "Invalid argument passed for 'm'.");
@@ -92,6 +128,12 @@ int main(int argc, char *argv[]) {
       fn = &iterative;
       break;
     case MEMOIZED:
+      struct rlimit rl;
+      rl.rlim_cur = stack_size * 1024 * 1024;
+      rl.rlim_max = stack_size * 1024 * 1024;
+      setrlimit(RLIMIT_STACK, &rl);
+      getrlimit(RLIMIT_STACK, &rl);
+      printf("Stack size: %ld (MB), max stack: %ld (MB)\n", rl.rlim_cur / 1024 / 1024, rl.rlim_max / 1024 / 1024);
       a = "memoized";
       fn = &memoized;
       break;
@@ -162,6 +204,7 @@ void usage(void) {
   fprintf(stderr, "Calculates the Ackermann function given M and N.\n\n");
   fprintf(stderr, "  -m | -i\tChooses the Ackermann implementation to use. -m is memoized and -i is iterative. Specifying multiple options will use the last specified.\n");
   fprintf(stderr, "  -l LOOPS\tRuns the algorithm with the given inputs LOOPS times and analyzes the results.\n\n");
+  fprintf(stderr, "  -s STACK_SIZE\tSets the max stack size in MB to STACK_SIZE. Must be greater than 0.\n\n");
   fprintf(stderr, "Note that 'm' values greater than 4 are ill-advised- ack(4,2) has 19 thousand digits.\n");
   exit(EXIT_FAILURE);
 }

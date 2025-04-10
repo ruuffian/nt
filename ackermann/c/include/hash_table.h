@@ -47,9 +47,10 @@ hash_table *hash_table_create(size_t size);
 void hash_table_destroy(hash_table *ht);
 
 /**
- * Associate key -> value in ht. Returns true if successful, false otherwise
+ * Associate key -> value in ht. Returns a pointer to the entry that is stored
+ * at key, returns NULL if insert fails.
  */
-bool hash_table_insert(hash_table *ht, key key, entry *v);
+entry *hash_table_insert(hash_table *ht, key key, entry *v);
 
 /** 
  * Lookup a key in a hash_table. If 'key' is found in the table, returns the 
