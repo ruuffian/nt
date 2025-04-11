@@ -14,7 +14,7 @@ CFLAGS := -std=c99 -Wall -Wextra -Werror
 INCDIR := -I./include
 .PHONY: all clean dir build
 
-all : CFLAGS := $(CFLAGS) -O3
+all : CFLAGS := $(CFLAGS) -O3 -ffast-math
 all : $(NAME)
 
 debug : CFLAGS := $(CFLAGS) -g -Og

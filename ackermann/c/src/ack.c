@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <float.h>
 #include <getopt.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@
 /* Print application usage statement and terminate. */
 void usage(void);
 /* Call fn(m, n) 'loops'-many times and print some basic analytics. */
-void _benchmark(ackermann_fn, uint64_t, uint64_t, int);
+void _benchmark(ackermann_fn_t, uint64_t, uint64_t, int);
 /* Get the current time in nanoseconds */
 double _get_time();
 
@@ -112,7 +113,7 @@ int main(int argc, char *argv[]) {
     /* NOT REACHED */
   }
   /* Select algorithm- I'm almost positive there's an easier way. */
-  ackermann_fn fn;
+  ackermann_fn_t fn;
   char *a;
   struct rlimit rl;
   switch (algorithm) {
@@ -154,7 +155,7 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
-void _benchmark(ackermann_fn fn, uint64_t m, uint64_t n, int loops) {
+void _benchmark(ackermann_fn_t fn, uint64_t m, uint64_t n, int loops) {
   int counter = 0;
   double *times = calloc(loops, sizeof(double));
   if (times == NULL) {

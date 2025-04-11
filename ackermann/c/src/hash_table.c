@@ -5,21 +5,21 @@
 /**
  * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
  */
-int _keycmp(key p1, key p2);
+int _keycmp(key_t p1, key_t p2);
 
 /**
  * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
  * elements.
  */
-uint64_t _keyhash(key key, size_t size);
+uint64_t _keyhash(key_t key, size_t size);
 
-hash_table *hash_table_create(size_t size) {
-  hash_table *ht;
-  ht = malloc(sizeof(hash_table));
+hash_table_t *hash_table_create(size_t size) {
+  hash_table_t *ht;
+  ht = malloc(sizeof(hash_table_t));
   if (ht == NULL)
     return NULL;
   ht->size = size;
-  ht->table = (entry **)calloc(size, sizeof(entry *));
+  ht->table = (entry_t **)calloc(size, sizeof(entry_t *));
   if (ht->table == NULL) {
     free(ht);
     return NULL;
@@ -27,66 +27,67 @@ hash_table *hash_table_create(size_t size) {
   return ht;
 }
 
-void hash_table_destroy(hash_table *ht) {
-  /* Since we make no assumptions about our clients data, freeing individual
-   * table entries is up to the user.
-   */
+void hash_table_destroy(hash_table_t *ht) {
+  size_t i;
+  for (i = 0; i < ht->size; i++) {
+    free(ht->table[i]);
+  }
   free(ht->table);
   free(ht);
 }
 
-entry *hash_table_insert(hash_table *ht, key key, entry *v) {
-  if (ht == NULL || v == NULL)
+entry_t *hash_table_insert(hash_table_t *ht, key_t key, entry_t *e) {
+  if (ht == NULL || e == NULL)
     return NULL;
   uint64_t index = _keyhash(key, ht->size);
-  entry *tmp = ht->table[index];
-  ht->table[index] = v;
+  entry_t *tmp = ht->table[index];
+  ht->table[index] = e;
   if (tmp == NULL)
-    return v;
+    return e;
   return tmp;
 }
 
-entry *hash_table_delete(hash_table *ht, key key) {
+entry_t *hash_table_delete(hash_table_t *ht, key_t key) {
   if (ht == NULL)
     return NULL;
   uint64_t idx = _keyhash(key, ht->size);
   if (ht->table[idx] != NULL && _keycmp(ht->table[idx]->key, key) == 0) {
-    entry *tmp = ht->table[idx];
+    entry_t *tmp = ht->table[idx];
     ht->table[idx] = NULL;
     return tmp;
   }
   return NULL;
 }
 
-entry *hash_table_lookup(hash_table *ht, key key) {
+entry_t *hash_table_lookup(hash_table_t *ht, key_t key) {
   uint64_t index = _keyhash(key, ht->size);
   if (ht->table[index] != NULL && _keycmp(ht->table[index]->key, key) == 0)
     return ht->table[index];
   return NULL;
 }
 
-void hash_table_print(hash_table *ht) {
+void hash_table_print(hash_table_t *ht) {
   printf("\tHash\t---\tEntry\t\n");
   size_t i;
   for (i = 0; i < ht->size; i++) {
     if (ht->table[i] == NULL) {
       printf("\t%ld\t---\n", i);
     } else {
-      entry *a = ht->table[i];
-      printf("\t%ld\t---\t(%ld, %ld)=>%ld\t\n", i, a->key.m, a->key.n,
-             a->value);
+      entry_t *e = ht->table[i];
+      printf("\t%ld\t---\t(%ld, %ld)=>%ld\t\n", i, e->key.m, e->key.n,
+             e->value);
     }
   }
   printf("\n");
 }
 
-uint64_t _keyhash(key key, size_t size) {
+uint64_t _keyhash(key_t key, size_t size) {
   uint64_t m = key.m;
   uint64_t n = key.n;
   return ((((m + n + 1) * (m + n)) / 2) + n) % size;
 }
 
-int _keycmp(key k1, key k2) {
+int _keycmp(key_t k1, key_t k2) {
   if (k1.m == k2.m && k1.n == k2.n)
     return 0;
   return 1;
