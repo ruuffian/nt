@@ -2,7 +2,7 @@ from functools import cache
 
 
 # ----- ALGORITHMS ----
-def naive(m, n):
+def naive(m: int, n: int) -> int:
     """Naive Ackermann function implementation."""
     if m == 0:
         return n + 1
@@ -12,7 +12,7 @@ def naive(m, n):
 
 
 @cache
-def lru(m, n):
+def cached(m: int, n: int) -> int:
     """Despite being about a millisecond faster than the home-grown
     memoization, this function absolutely explodes as soon as you give it more
     more than a(3, 10) unless you CRANK the max recursion limit.
@@ -20,11 +20,11 @@ def lru(m, n):
     if m == 0:
         return n + 1
     if n == 0:
-        return lru(m - 1, 1)
-    return lru(m - 1, lru(m, n - 1))
+        return cached(m - 1, 1)
+    return cached(m - 1, cached(m, n - 1))
 
 
-def memoized(m, n):
+def memoized(m: int, n: int) -> int:
     """I cheated by reading the functools source code to learn some small
     optimizations like calculating a key rather than useing a large object
     and giving a default return to cache.get() to check if the key exists
@@ -47,14 +47,14 @@ def memoized(m, n):
     costs, always remember that!
     """
     sentinel = object()
-    cache = {}
+    cache: dict[tuple[int, int], int] = {}
     cache_get = cache.get
 
-    def _(m, n):
+    def _(m: int, n: int) -> int:
         key = (m, n)
-        result = cache_get(key, sentinel)
+        result = cache_get(key, sentinel) # Type narrowing
         if result is not sentinel:
-            return result
+            return result  # pyright: ignore[reportReturnType]
         else:
             val = n + 1
             if m == 0:
@@ -71,16 +71,14 @@ def memoized(m, n):
     return _(m, n)
 
 
-def iterative(i, n):
+def iterative(i: int, n: int) -> int:
     """I read this in a paper and wanted to try implementing it with numpy.
     I'm **pretty** sure the extra load time is worth using numpy for vector
     operations, but now that I'm thinking about it the entire algorithm is
     iterative anyways...hmm.
     """
-    import numpy as np
-
-    next = np.arange(i + 1) * 0
-    goal = np.arange(i + 1) * 0 + 1
+    next = [0 for _ in range(0, i + 2)]
+    goal = [1 for _ in range(0, i + 2)]
     goal[i] = -1
     current = i
     while next[i] != n + 1:
@@ -94,4 +92,4 @@ def iterative(i, n):
                 transferring = False
             next[i - current] = next[i - current] + 1
             current -= 1
-    return value
+    return value  # pyright: ignore[reportPossiblyUnboundVariable]

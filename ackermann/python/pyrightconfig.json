@@ -1,0 +1,13 @@
+{
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "shell.nix",
+  ],
+  "reportMissingImports": "error",
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Linux",
+}

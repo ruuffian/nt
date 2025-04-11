@@ -4,17 +4,19 @@ import sys
 import timeit
 import time
 import argparse
+from typing import Callable
 import numpy as np
-from ackermann import naive, lru, memoized, iterative
+from ackermann import naive, cached, memoized, iterative
 
 # ----- GLOBALS -----
-M = 0
-N = 0
-ITERATIONS = 0
+m = 0
+n = 0
+iterations = 0
+algorithm = "naive"
 
 
 # ----- BENCHMARKING ------
-def benchmark(fn_str):
+def benchmark(fn_str: str):
     """Coordinate calls on a function."""
     SETUP = f"""
 if ALGORITHM == 'lru':
@@ -24,13 +26,13 @@ if ALGORITHM == 'lru':
         stmt=f"{fn_str}(M, N)",
         globals=globals(),
         setup=SETUP,
-        repeat=ITERATIONS,
+        repeat=iterations,
         number=1,
     )
     return marks
 
 
-def report_marks(fn_str, marks):
+def report_marks(marks: list[float]):
     times, avg, min, max, median, variance, std_dev = analyze_marks(marks)
     print(f"Runtime Metrics [{len(times)} loops] => {{")
     print(f"\tPeek (top 5): {sorted(times, reverse=True)[0:5]}")
@@ -44,7 +46,7 @@ def report_marks(fn_str, marks):
 
 
 # ----- DATA ANALYSIS ------
-def analyze_marks(raw_marks):
+def analyze_marks(raw_marks: list[float]):
     """Recieves a list of marks and calculates basic summary statistics.
     This area had a bit more before adding NumPy.
     """
@@ -66,11 +68,14 @@ def analyze_marks(raw_marks):
 def main():
     # Default recursion limit too low for the Ackermann function
     sys.setrecursionlimit(10**6)
-    fns = {"naive": naive, "memoized": memoized, "lru": lru, "iterative": iterative}
-    print(f"{ALGORITHM}({M},{N})=", end=" ")
-    fn = fns[ALGORITHM]
-    m = M
-    n = N
+    fns: dict[str, Callable[[int, int], int]] = {
+        "naive": naive,
+        "memoized": memoized,
+        "cached": cached,
+        "iterative": iterative,
+    }
+    print(f"{algorithm}({m},{n})=", end=" ")
+    fn = fns[algorithm]
     start = time.perf_counter_ns()
     val = fn(m, n)
     end = time.perf_counter_ns()
@@ -78,10 +83,10 @@ def main():
     print(val)
     # print(f'\tTotal Recursive Calls: {calls}')
     print(f"Runtime: {(end - start) / 1e6} (ms)")
-    if ITERATIONS > 0:
-        print(f"Benchmarking {ALGORITHM} alg...")
-        marks = benchmark(ALGORITHM)
-        report_marks(ALGORITHM, marks)
+    if iterations > 0:
+        print(f"Benchmarking {algorithm} alg...")
+        marks = benchmark(algorithm)
+        report_marks(marks)
 
 
 if __name__ == "__main__":
@@ -89,25 +94,29 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Benchmarks varius Ackermann's function implementations against each other."
     )
-    parser.add_argument("m", type=int, help="First argument to Ackermann's function.")
-    parser.add_argument("n", type=int, help="Second argument to Ackermann's function.")
-    parser.add_argument(
+    _ = parser.add_argument(
+        "m", type=int, help="First argument to Ackermann's function."
+    )
+    _ = parser.add_argument(
+        "n", type=int, help="Second argument to Ackermann's function."
+    )
+    _ = parser.add_argument(
         "--loops",
         "-l",
         type=int,
         help="The number of iterations to use for benchmarking.",
         default=0,
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--algorithm",
         "-a",
         help="Choosing the algorithm to calculate with.",
-        choices=["naive", "memoized", "iterative", "lru"],
+        choices=["naive", "memoized", "iterative", "cached"],
         default="naive",
     )
     args = vars(parser.parse_args())
-    M = args["m"]
-    N = args["n"]
-    ITERATIONS = args["loops"]
-    ALGORITHM = args["algorithm"]
+    m: int = args["m"]
+    n: int = args["n"]
+    iterations: int = args["loops"]
+    algorithm: str = args["algorithm"]
     main()
