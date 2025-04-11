@@ -4,3 +4,5 @@
 *.out
 *.so
 **pycache**
+.cache
+
