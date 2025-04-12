@@ -183,7 +183,8 @@ void _benchmark(ackermann_fn_t fn, uint64_t m, uint64_t n, int loops) {
   }
   double median = times[(loops / 2) - 1];
   double avg = sum / (double)loops;
-  printf("Runtime metrics [%d loops] => {\n", loops);
+  printf("Total Time Taken [%d loops]: %lf (ms)\n", loops, sum);
+  printf("Runtime metrics => {\n");
   /* I need to implement a sorting algorithm :D
   printf("Peek (top %d): [", peek);
   int i;

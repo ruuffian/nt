@@ -87,8 +87,4 @@ uint64_t _keyhash(key_t key, size_t size) {
   return ((((m + n + 1) * (m + n)) / 2) + n) % size;
 }
 
-int _keycmp(key_t k1, key_t k2) {
-  if (k1.m == k2.m && k1.n == k2.n)
-    return 0;
-  return 1;
-}
+int _keycmp(key_t k1, key_t k2) { return (k1.m == k2.m && k1.n == k2.n); }
