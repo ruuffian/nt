@@ -18,43 +18,43 @@
 typedef struct {
   uint64_t m;
   uint64_t n;
-} key_t;
+} hash_table_key;
 
 /* Table value type- we store the key in the value to double check the value
  * stored at the hashed index is actually the one we like, in case of
  * collisions.
  */
 typedef struct {
-  key_t key;
+  hash_table_key key;
   uint64_t value;
-} entry_t;
+} hash_table_entry;
 
 typedef struct {
-  entry_t **table;
+  hash_table_entry **table;
   size_t size;
-} hash_table_t;
+} hash_table;
 
 /**
  * Initialize a hash_table that can contain 'size' elements.
  */
-hash_table_t *hash_table_create(size_t size);
+hash_table *hash_table_create(size_t size);
 
 /**
  * Frees a hash_table.
  */
-void hash_table_destroy(hash_table_t *ht);
+void hash_table_destroy(hash_table *ht);
 
 /**
  * Associate key -> value in ht. Returns a pointer to the entry that is stored
  * at key, returns NULL if insert fails.
  */
-entry_t *hash_table_insert(hash_table_t *ht, key_t key, entry_t *v);
+hash_table_entry *hash_table_insert(hash_table *ht, hash_table_key key, hash_table_entry *v);
 
 /**
  * Lookup a key in a hash_table. If 'key' is found in the table, returns the
  * value associted with it. Otherwise, returns NULL.
  */
-entry_t *hash_table_lookup(hash_table_t *ht, key_t key);
+hash_table_entry *hash_table_lookup(hash_table *ht, hash_table_key key);
 
 /**
  * Remove the value associated with 'key' from the given hash_table. If
@@ -62,10 +62,10 @@ entry_t *hash_table_lookup(hash_table_t *ht, key_t key);
  * returns NULL. Otherwise, returns the value associated with 'key'. Remember
  * to free() this value if it was allocated on the heap.
  */
-entry_t *hash_table_delete(hash_table_t *ht, key_t key);
+hash_table_entry *hash_table_delete(hash_table *ht, hash_table_key key);
 
 /**
  * Prints a hash_table to stdout.
  */
-void hash_table_print(hash_table_t *ht);
+void hash_table_print(hash_table *ht);
 #endif

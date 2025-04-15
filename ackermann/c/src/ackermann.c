@@ -5,13 +5,13 @@
 #include "hash_table.h"
 
 /* Allocates an 'ack' on the heap and associates it with a given key */
-void _cache_ack(hash_table_t *table, uint64_t value, key_t key);
+void _cache_ack(hash_table *table, uint64_t value, hash_table_key key);
 /* Internal memoized ackermann calculation */
-uint64_t _memoized(uint64_t m, uint64_t n, hash_table_t *table);
+uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table);
 
 uint64_t naive(uint64_t m, uint64_t n) {
   if (m == 0)
-    return (uint64_t)n + 1;
+    return n + 1;
   else if (n == 0)
     return naive(m - 1, 1);
   else
@@ -19,7 +19,7 @@ uint64_t naive(uint64_t m, uint64_t n) {
 }
 
 uint64_t memoized(uint64_t m, uint64_t n) {
-  hash_table_t *t = hash_table_create(30);
+  hash_table *t = hash_table_create(30);
   if (t == NULL) {
     fprintf(stderr, "Failed to create hash table.");
     abort();
@@ -29,13 +29,13 @@ uint64_t memoized(uint64_t m, uint64_t n) {
   return val;
 }
 
-uint64_t _memoized(uint64_t m, uint64_t n, hash_table_t *table) {
-  key_t key = {m, n};
-  entry_t *e = hash_table_lookup(table, key);
+uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table) {
+  hash_table_key key = {m, n};
+  hash_table_entry *e = hash_table_lookup(table, key);
   if (e != NULL)
     return e->value;
   if (m == 0) {
-    uint64_t value = (uint64_t)n + 1;
+    uint64_t value = n + 1;
     _cache_ack(table, value, key);
     return value;
   } else if (n == 0) {
@@ -49,8 +49,8 @@ uint64_t _memoized(uint64_t m, uint64_t n, hash_table_t *table) {
   }
 }
 
-void _cache_ack(hash_table_t *table, uint64_t value, key_t key) {
-  entry_t *e = malloc(sizeof(entry_t));
+void _cache_ack(hash_table *table, uint64_t value, hash_table_key key) {
+  hash_table_entry *e = malloc(sizeof(hash_table_entry));
   if (e == NULL) {
     fprintf(stderr, "Memory allocation failed.\n");
     abort();
@@ -58,7 +58,7 @@ void _cache_ack(hash_table_t *table, uint64_t value, key_t key) {
   }
   e->key = key;
   e->value = value;
-  entry_t *tmp;
+  hash_table_entry *tmp;
   if ((tmp = hash_table_insert(table, key, e)) == NULL) {
     fprintf(stderr, "Failed to insert into cache.\n");
     abort();

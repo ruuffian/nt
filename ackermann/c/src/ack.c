@@ -20,17 +20,18 @@
 
 #include "ackermann.h"
 
-#define STACK_SIZE 16
+#define DEF_STACK_SIZE 16
+#define MAX_STACK_MEMORY 2048
 
 /* Print application usage statement and terminate. */
 void usage(void);
 /* Call fn(m, n) 'loops'-many times and print some basic analytics. */
-void _benchmark(ackermann_fn_t, uint64_t, uint64_t, int);
+void _benchmark(ackermann_fn, uint64_t, uint64_t, int);
 /* Get the current time in nanoseconds */
 double _get_time();
 
 /* Available ackermann_fn algorithms */
-typedef enum { NAIVE, ITERATIVE, MEMOIZED } algorithm_t;
+typedef enum { NAIVE, ITERATIVE, MEMOIZED } algorithm;
 
 /* Global program name for usage() */
 char *_progname;
@@ -38,10 +39,10 @@ char *_progname;
 int main(int argc, char *argv[]) {
   _progname = argv[0];
   int c;
-  algorithm_t algorithm = NAIVE;
-  rlim_t stack_size = STACK_SIZE;
+  algorithm algorithm = NAIVE;
+  rlim_t stack_size = DEF_STACK_SIZE;
   char *tmp;
-  int loops = 0, s, l;
+  int loops = 0;
   while ((c = getopt(argc, argv, ":himl:s:")) != -1) {
     switch (c) {
     case 'h':
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
       algorithm = MEMOIZED;
       break;
     case 'l':
-      l = strtol(optarg, &tmp, 10);
+      int l = strtol(optarg, &tmp, 10);
       if (tmp == optarg || *tmp != '\0') {
         fprintf(stderr, "Invalid argument passed for 'l'.\n");
         return EXIT_FAILURE;
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]) {
       loops = l;
       break;
     case 's':
-      s = strtol(optarg, &tmp, 10);
+      int s = strtol(optarg, &tmp, 10);
       if (tmp == optarg || *tmp != '\0') {
         fprintf(stderr, "Invalid argument passed for 's'.\n");
         return EXIT_FAILURE;
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "'s' value must be greater than 0.\n");
         return EXIT_FAILURE;
       }
-      if (s > 1024) {
+      if (s > MAX_STACK_MEMORY) {
         fprintf(stderr, "'s' value must be less than 1024.\n");
         return EXIT_FAILURE;
       }
@@ -113,7 +114,7 @@ int main(int argc, char *argv[]) {
     /* NOT REACHED */
   }
   /* Select algorithm- I'm almost positive there's an easier way. */
-  ackermann_fn_t fn;
+  ackermann_fn fn;
   char *a;
   struct rlimit rl;
   switch (algorithm) {
@@ -141,9 +142,8 @@ int main(int argc, char *argv[]) {
   }
   /* Run the function once for quick feedback, then check for benchmarking */
   double start, end, delta;
-  uint64_t val;
   start = _get_time();
-  val = (*fn)(m, n);
+  uint64_t val = (*fn)(m, n);
   end = _get_time();
   delta = (end - start) / (double)1000;
   fprintf(stdout, "%s(%ld, %ld) = %ld\n", a, m, n, val);
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
   return EXIT_SUCCESS;
 }
 
-void _benchmark(ackermann_fn_t fn, uint64_t m, uint64_t n, int loops) {
+void _benchmark(ackermann_fn fn, uint64_t m, uint64_t n, int loops) {
   int counter = 0;
   double *times = calloc(loops, sizeof(double));
   if (times == NULL) {
