@@ -2,13 +2,13 @@
   {
     "arguments": [
       "/nix/store/gnd8f9h2ycxrfrvrga508c4n9cxy6720-gcc-wrapper-13.3.0/bin/gcc",
-      "-std=c99",
+      "-std=c2x",
       "-Wall",
       "-Wextra",
       "-Werror",
-      "-fpic",
+      "-pedantic",
       "-O3",
-      "-ffast-math",
+      "-fPIC",
       "-I./include",
       "-c",
       "-o",

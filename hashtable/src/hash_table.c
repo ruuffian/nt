@@ -1,11 +1,8 @@
+#include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "hash_table.h"
-
-/**
- * Compares 'p1' to 'p2'. Returns 0 if they are identical, 1 otherwise.
- */
-int _keycmp(char *p1, char *p2);
 
 /**
  * Hashes 'key' for insertion in a hash_table with a capacity of 'size'
@@ -13,21 +10,17 @@ int _keycmp(char *p1, char *p2);
  */
 uint32_t _hash(char *key, size_t size);
 
-hash_table_t *hash_table_create(size_t max_size, hashfn_t hf, cleanupfn_t c) {
-  if (max_size < 1)
+hash_table *hash_table_create(size_t size, cleanup_fn c) {
+  if (size < 1)
     return NULL;
-  if (hf == NULL)
-    hf = &_hash;
   if (c == NULL)
     c = &free;
-  hash_table_t *ht;
-  ht = malloc(sizeof(hash_table_t));
+  hash_table *ht;
+  ht = malloc(sizeof(hash_table));
   if (ht == NULL)
     return NULL;
-  ht->max_size = max_size;
-  ht->size = (max_size / 10) + 1;
-  ht->table = (entry_t **)calloc(ht->size, sizeof(entry_t *));
-  ht->hash = hf;
+  ht->size = size;
+  ht->table = (entry **)calloc(ht->size, sizeof(entry *));
   ht->cleanup = c;
   if (ht->table == NULL) {
     free(ht);
@@ -36,72 +29,99 @@ hash_table_t *hash_table_create(size_t max_size, hashfn_t hf, cleanupfn_t c) {
   return ht;
 }
 
-void hash_table_destroy(hash_table_t *ht) {
+void hash_table_destroy(hash_table *ht) {
   size_t i;
   for (i = 0; i < ht->size; i++) {
-    ht->cleanup(ht->table[i]);
+    entry *prev, *e = ht->table[i];
+    /* Need to free linked list stored in each bucket. */
+    while (e != NULL) {
+      free(e->key);
+      ht->cleanup(e->data);
+      prev = e;
+      e = e->next;
+      free(prev);
+    }
   }
   free(ht->table);
   free(ht);
 }
 
-entry_t *hash_table_insert(hash_table_t *ht, char *key, void *e) {
-  if (ht == NULL || e == NULL)
+entry *hash_table_insert(hash_table *ht, char *key, void *d) {
+  if (ht == NULL || d == NULL)
     return NULL;
-  uint32_t index = ht->hash(key, ht->size);
-  entry_t *tmp = ht->table[index];
-  entry_t *n = malloc(sizeof(entry_t));
-  // TODO: Allocate memory for key and use it.
-  n->key = key;
-  n->data = e;
-  ht->table[index] = n;
-  if (tmp == NULL)
-    return e;
-  return tmp;
+  uint32_t index = _hash(key, ht->size);
+  entry *new_entry = malloc(sizeof(entry));
+  /* Need to allocate memory for key in case char *key is stack-allocated */
+  char *new_key = strdup(key);
+  if (new_entry == NULL)
+    return NULL;
+  new_entry->key = new_key;
+  new_entry->data = d;
+  entry *current = ht->table[index];
+  ht->table[index] = new_entry;
+  if (current != NULL)
+    new_entry->next = current;
+  else
+    new_entry->next = NULL;
+  return new_entry;
 }
 
-entry_t *hash_table_delete(hash_table_t *ht, key_t key) {
+entry *hash_table_delete(hash_table *ht, char *key) {
   if (ht == NULL)
     return NULL;
-  uint64_t idx = _keyhash(key, ht->size);
-  if (ht->table[idx] != NULL && _keycmp(ht->table[idx]->key, key) == 0) {
-    entry_t *tmp = ht->table[idx];
-    ht->table[idx] = NULL;
-    return tmp;
+  uint32_t idx = _hash(key, ht->size);
+  entry *prev = NULL, *cur = ht->table[idx];
+  while (cur != NULL) {
+    if (strcmp(cur->key, key) == 0) {
+      /* Deleting the head. */
+      if (prev == NULL) {
+        ht->table[idx] = NULL;
+        return cur;
+      }
+      prev->next = cur->next;
+      return cur;
+    }
+    prev = cur;
+    cur = cur->next;
   }
   return NULL;
 }
 
-entry_t *hash_table_lookup(hash_table_t *ht, key_t key) {
-  uint64_t index = _keyhash(key, ht->size);
-  if (ht->table[index] != NULL && _keycmp(ht->table[index]->key, key) == 0)
-    return ht->table[index];
+entry *hash_table_lookup(hash_table *ht, char *key) {
+  uint32_t index = _hash(key, ht->size);
+  entry *cur = ht->table[index];
+  while (cur != NULL) {
+    if (strcmp(cur->key, key) == 0)
+      return cur;
+    cur = cur->next;
+  }
   return NULL;
 }
 
-void hash_table_print(hash_table_t *ht) {
+void hash_table_print(hash_table *ht) {
   printf("\tHash\t---\tEntry\t\n");
   size_t i;
   for (i = 0; i < ht->size; i++) {
     if (ht->table[i] == NULL) {
       printf("\t%ld\t---\n", i);
     } else {
-      entry_t *e = ht->table[i];
-      printf("\t%ld\t---\t(%ld, %ld)=>%ld\t\n", i, e->key.m, e->key.n,
-             e->value);
+      entry *e = ht->table[i];
+      printf("\t%ld\t---\t%s", i, e->key);
+      while (e->next != NULL) {
+        e = e->next;
+        printf("---%s", e->key);
+      }
+      printf("\n");
     }
   }
   printf("\n");
 }
 
-uint64_t _keyhash(key_t key, size_t size) {
-  uint64_t m = key.m;
-  uint64_t n = key.n;
-  return ((((m + n + 1) * (m + n)) / 2) + n) % size;
-}
-
-int _keycmp(key_t k1, key_t k2) {
-  if (k1.m == k2.m && k1.n == k2.n)
-    return 0;
-  return 1;
+uint32_t _hash(char *key, size_t size) {
+  char *tmp = key;
+  uint32_t hash = 5381;
+  int c;
+  while ((c = *tmp++))
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  return hash % size;
 }
