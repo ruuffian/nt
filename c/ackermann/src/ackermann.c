@@ -5,7 +5,7 @@
 #include "hash_table.h"
 
 /* Allocates an 'ack' on the heap and associates it with a given key */
-void _cache_ack(hash_table *table, uint64_t value, hash_table_key key);
+void _cache(hash_table *table, uint64_t value, tuple key);
 /* Internal memoized ackermann calculation */
 uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table);
 
@@ -19,38 +19,39 @@ uint64_t naive(uint64_t m, uint64_t n) {
 }
 
 uint64_t memoized(uint64_t m, uint64_t n) {
-  hash_table *t = hash_table_create(30);
+  hash_table *t = ht_create(64);
   if (t == NULL) {
     fprintf(stderr, "Failed to create hash table.");
     abort();
+    /* NOT REACHED. */
   }
   uint64_t val = _memoized(m, n, t);
-  hash_table_destroy(t);
+  ht_destroy(t);
   return val;
 }
 
 uint64_t _memoized(uint64_t m, uint64_t n, hash_table *table) {
-  hash_table_key key = {m, n};
-  hash_table_entry *e = hash_table_lookup(table, key);
-  if (e != NULL)
-    return e->value;
+  tuple key = {m, n};
+  record *r = ht_lookup(table, key);
+  if (r != NULL)
+    return r->value;
   if (m == 0) {
     uint64_t value = n + 1;
-    _cache_ack(table, value, key);
+    _cache(table, value, key);
     return value;
   } else if (n == 0) {
     uint64_t value = _memoized(m - 1, 1, table);
-    _cache_ack(table, value, key);
+    _cache(table, value, key);
     return value;
   } else {
     uint64_t value = _memoized(m - 1, _memoized(m, n - 1, table), table);
-    _cache_ack(table, value, key);
+    _cache(table, value, key);
     return value;
   }
 }
 
-void _cache_ack(hash_table *table, uint64_t value, hash_table_key key) {
-  hash_table_entry *e = malloc(sizeof(hash_table_entry));
+void _cache(hash_table *table, uint64_t value, tuple key) {
+  record *e = malloc(sizeof(record));
   if (e == NULL) {
     fprintf(stderr, "Memory allocation failed.\n");
     abort();
@@ -58,8 +59,8 @@ void _cache_ack(hash_table *table, uint64_t value, hash_table_key key) {
   }
   e->key = key;
   e->value = value;
-  hash_table_entry *tmp;
-  if ((tmp = hash_table_insert(table, key, e)) == NULL) {
+  record *tmp;
+  if ((tmp = ht_insert(table, key, e)) == NULL) {
     fprintf(stderr, "Failed to insert into cache.\n");
     abort();
     /* NOT REACHED */
