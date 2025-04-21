@@ -6,6 +6,7 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-pedantic",
       "-O3",
       "-I./include",
       "-c",
@@ -13,9 +14,9 @@
       "build/ack.o",
       "src/ack.c"
     ],
-    "directory": "/home/ruuffian/code/dev/nt/ackermann/c",
-    "file": "/home/ruuffian/code/dev/nt/ackermann/c/src/ack.c",
-    "output": "/home/ruuffian/code/dev/nt/ackermann/c/build/ack.o"
+    "directory": "/home/ruuffian/code/dev/nt/c/ackermann",
+    "file": "/home/ruuffian/code/dev/nt/c/ackermann/src/ack.c",
+    "output": "/home/ruuffian/code/dev/nt/c/ackermann/build/ack.o"
   },
   {
     "arguments": [
@@ -24,6 +25,7 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-pedantic",
       "-O3",
       "-I./include",
       "-c",
@@ -31,9 +33,9 @@
       "build/ackermann.o",
       "src/ackermann.c"
     ],
-    "directory": "/home/ruuffian/code/dev/nt/ackermann/c",
-    "file": "/home/ruuffian/code/dev/nt/ackermann/c/src/ackermann.c",
-    "output": "/home/ruuffian/code/dev/nt/ackermann/c/build/ackermann.o"
+    "directory": "/home/ruuffian/code/dev/nt/c/ackermann",
+    "file": "/home/ruuffian/code/dev/nt/c/ackermann/src/ackermann.c",
+    "output": "/home/ruuffian/code/dev/nt/c/ackermann/build/ackermann.o"
   },
   {
     "arguments": [
@@ -42,6 +44,7 @@
       "-Wall",
       "-Wextra",
       "-Werror",
+      "-pedantic",
       "-O3",
       "-I./include",
       "-c",
@@ -49,8 +52,8 @@
       "build/hash_table.o",
       "src/hash_table.c"
     ],
-    "directory": "/home/ruuffian/code/dev/nt/ackermann/c",
-    "file": "/home/ruuffian/code/dev/nt/ackermann/c/src/hash_table.c",
-    "output": "/home/ruuffian/code/dev/nt/ackermann/c/build/hash_table.o"
+    "directory": "/home/ruuffian/code/dev/nt/c/ackermann",
+    "file": "/home/ruuffian/code/dev/nt/c/ackermann/src/hash_table.c",
+    "output": "/home/ruuffian/code/dev/nt/c/ackermann/build/hash_table.o"
   }
 ]

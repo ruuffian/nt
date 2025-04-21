@@ -15,8 +15,8 @@
       "build/hash_table.o",
       "src/hash_table.c"
     ],
-    "directory": "/home/ruuffian/code/dev/nt/hashtable",
-    "file": "/home/ruuffian/code/dev/nt/hashtable/src/hash_table.c",
-    "output": "/home/ruuffian/code/dev/nt/hashtable/build/hash_table.o"
+    "directory": "/home/ruuffian/code/dev/nt/c/hashtable",
+    "file": "/home/ruuffian/code/dev/nt/c/hashtable/src/hash_table.c",
+    "output": "/home/ruuffian/code/dev/nt/c/hashtable/build/hash_table.o"
   }
 ]

@@ -13,6 +13,9 @@ OBJFILES := $(patsubst src/%.c,build/%.o, $(SRCFILES))
 CC := gcc
 CFLAGS := -std=c2x -Wall -Wextra -Werror -pedantic
 INCDIR := -I./include
+LIBDIRS := -L./lib
+LIBS := -lht
+
 .PHONY: all clean dir build
 
 all : CFLAGS := $(CFLAGS) -O3
@@ -41,4 +44,4 @@ install:
 
 test : CFLAGS := $(CFLAGS) -g -Og
 test: dir
-	$(CC) $(CFLAGS) $(INCDIR) -lht -L./$(LIB) $(TEST)/test.c -o $(BIN)/test
+	$(CC) $(CFLAGS) $(INCDIR) $(LIBS) $(LIBDIRS) $(TEST)/test.c -o $(BIN)/test
