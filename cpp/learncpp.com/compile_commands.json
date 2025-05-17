@@ -1,0 +1,20 @@
+[
+  {
+    "arguments": [
+      "/nix/store/mzfk1sdv6bxvdh9slvddpj734ck99idi-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++20",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-O3",
+      "-o",
+      "bin/hello",
+      "hello.cpp"
+    ],
+    "directory": "/home/ruuffian/code/dev/nt/cpp/learncpp.com",
+    "file": "/home/ruuffian/code/dev/nt/cpp/learncpp.com/hello.cpp",
+    "output": "/home/ruuffian/code/dev/nt/cpp/learncpp.com/bin/hello"
+  }
+]

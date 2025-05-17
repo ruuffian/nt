@@ -1,0 +1,20 @@
+[
+  {
+    "arguments": [
+      "/nix/store/mzfk1sdv6bxvdh9slvddpj734ck99idi-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++20",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-O3",
+      "-o",
+      "exe",
+      "main.cpp"
+    ],
+    "directory": "/home/ruuffian/code/dev/nt/cpp/test-error-flags",
+    "file": "/home/ruuffian/code/dev/nt/cpp/test-error-flags/main.cpp",
+    "output": "/home/ruuffian/code/dev/nt/cpp/test-error-flags/exe"
+  }
+]

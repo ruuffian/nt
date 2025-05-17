@@ -4,9 +4,9 @@
  * Description: This is a C-implementation of a hash table which is attempting
  * to be type-agnostic.
  *  - Data is not typed
- *  - Key is a string
- *  - Supports external chaining for 'infinite' table size, but compromises
- *    lookup speed.
+ *  - Key is an int
+ *  - Uses open-addressing to resolve collisions
+ *  - Reallocates when load factor is 0.6
  */
 #ifndef __HASH_TABLE_H
 #define __HASH_TABLE_H
